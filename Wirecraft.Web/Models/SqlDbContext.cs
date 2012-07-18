@@ -69,6 +69,10 @@ namespace Wirecraft.Web.Models
             orderEntity
                 .Property(x => x.timeStamp)
                 .IsRequired();
+
+			orderEntity
+				.HasRequired(x => x.customer)
+				.WithMany(x => x.orders);
         }
         protected void buildOrderItems(EntityTypeConfiguration<OrderItem> orderItemEntity) {
             orderItemEntity

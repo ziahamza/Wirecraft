@@ -11,10 +11,13 @@ namespace Wirecraft.Web.Controllers
     {
         public ActionResult Index()
         {
-            SqlDbContext k = new SqlDbContext();
-            var j = k.products.AsEnumerable();
-            HttpContext.Trace.Write(j.AsQueryable().Count().ToString());
+            SqlDbContext db = new SqlDbContext();
+			var orders = db.orders
+				.Where(x => x.status == OrderStatus.pending)
+				.ToList();
+			orders.ForEach(x => x.customer = db.customers.Where(y => y.customerID == x.customerID).SingleOrDefault());
             ViewBag.Message = "Modify this template to kick-start your ASP.NET MVC application.";
+			ViewBag.orders = orders;
             HttpContext.Trace.Write("Hi from trace!!");
 
             return View();
