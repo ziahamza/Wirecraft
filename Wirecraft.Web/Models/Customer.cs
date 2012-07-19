@@ -10,8 +10,7 @@ namespace Wirecraft.Web.Models
         public string name { get; set; }
         public int customerID { get; set; }
         public DateTime birthDay { get; set; }
-        public Blob photo { get; set; }
-        public ICollection<Order> orders { get; set; }
+        public string photoName { get; set; }
         public DateTime timeStamp { get; set; }
     }
 }

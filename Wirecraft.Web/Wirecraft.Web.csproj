@@ -135,28 +135,26 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Common\Enums.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201207181212084_initial.cs" />
-    <Compile Include="Migrations\201207181212084_initial.Designer.cs">
-      <DependentUpon>201207181212084_initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201207181213273_added-data.cs" />
-    <Compile Include="Migrations\201207181213273_added-data.Designer.cs">
-      <DependentUpon>201207181213273_added-data.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201207181219395_added more data.cs" />
-    <Compile Include="Migrations\201207181219395_added more data.Designer.cs">
-      <DependentUpon>201207181219395_added more data.cs</DependentUpon>
+    <Compile Include="Logic\DataAccess.cs" />
+    <Compile Include="Migrations\initial.cs" />
+    <Compile Include="Migrations\initial.Designer.cs">
+      <DependentUpon>initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Data\Blob.cs" />
+    <Compile Include="Data\Customer.cs" />
+    <Compile Include="Data\Order.cs" />
+    <Compile Include="Data\Product.cs" />
+    <Compile Include="Data\SqlDbContext.cs" />
     <Compile Include="Models\Blob.cs" />
     <Compile Include="Models\Customer.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\Product.cs" />
-    <Compile Include="Models\SqlDbContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

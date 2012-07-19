@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Wirecraft.Web.Models;
+using Newtonsoft.Json;
+using Wirecraft.Web.Logic;
 
 namespace Wirecraft.Web.Controllers
 {
@@ -11,13 +13,10 @@ namespace Wirecraft.Web.Controllers
     {
         public ActionResult Index()
         {
-            SqlDbContext db = new SqlDbContext();
-			var orders = db.orders
-				.Where(x => x.status == OrderStatus.pending)
-				.ToList();
-			orders.ForEach(x => x.customer = db.customers.Where(y => y.customerID == x.customerID).SingleOrDefault());
+            DataAccess dataLayer = new DataAccess();
+
             ViewBag.Message = "Modify this template to kick-start your ASP.NET MVC application.";
-			ViewBag.orders = orders;
+			ViewBag.objGraph = dataLayer.getDataGraph();
             HttpContext.Trace.Write("Hi from trace!!");
 
             return View();
