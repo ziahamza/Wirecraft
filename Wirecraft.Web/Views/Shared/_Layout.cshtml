@@ -29,9 +29,9 @@
             </div>
             <div class="nav-collapse">
                 <ul class="nav">
-                    <li class="active"><a href="#">Home</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li class="active"><a href="#/orders/status/pending">Orders</a></li>
+                    <li><a href="#about">Products</a></li>
+                    <li><a href="#contact">Customers</a></li>
                 </ul>
             </div>
             <!--/.nav-collapse -->
@@ -40,16 +40,7 @@
     </div>
 
     <div class="container-fluid">
-        <div class="row-fluid">
-            <div class="span3">
-				@RenderSection("navigation")
-            </div>
-            <!--/span-->
-            <div class="span9">
-                @RenderBody()
-            </div>
-            <!--/span-->
-        </div>
+        @RenderBody()
 
         <hr>
 
@@ -61,8 +52,7 @@
 
     <script type="text/javascript" src="~/Scripts/jquery-1.7.2.js"></script>
     <script type="text/javascript" src="~/Scripts/bootstrap.js"></script>
-    <script type="text/javascript" src="~/Scripts/knockout-2.0.0.js"></script>
-    <script type="text/javascript" src="~/Scripts/script.js"></script>
+	<script type="text/javascript" src="../../Scripts/underscore.js"></script>
     @RenderSection("scripts", required: false)
 </body>
 </html>

@@ -190,6 +190,7 @@
     </Content>
     <Content Include="Scripts\knockout-2.0.0.js" />
     <Content Include="Scripts\signals.js" />
+    <Content Include="Scripts\underscore.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -212,7 +213,7 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\_ordersOverviewView.cshtml" />
+    <Content Include="Views\Shared\_ordersStatusView.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

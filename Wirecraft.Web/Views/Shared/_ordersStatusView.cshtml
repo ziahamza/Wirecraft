@@ -1,0 +1,34 @@
+﻿<script type="text/html" id="ordersStatusView">
+<div class="span3">
+	<div class="well sidebar-nav">
+		<ul class="nav nav-list">
+			<li class="nav-header">Orders</li>
+			<li <% if (data.status === "pending") print('class="active" '); %>><a href="#/orders/status/pending">Pending Orders</a></li>
+			<li <% if (data.status === "completed") print('class="active" '); %>><a href="#/orders/status/completed">Completed Orders</a></li>
+			<li <% if (data.status === "stopped") print('class="active" '); %>><a href="#/orders/status/stopped">Stopped Orders</a></li>
+		</ul>
+	</div>
+	<!--/.well -->
+</div>
+<!--/span-->
+<div class="span9">
+    <div class="row-fluid" data-bind="foreach: <%= data.ordersFunc %>"> 
+		<div class="span4">
+			<h2>Order By: <a data-bind="text: $root.getCustomerById(customerID()).name, attr: {href: '#/customer/name/' + customerID()}"></a></h2>
+			<div data-bind="text: address"></div>
+			<div>Total Price: <b data-bind="text: '$' +  $root.getOrderPrice($data)"></b></div>
+			<a class="btn" href="#">View details &raquo;</a>
+			<a class="btn" href="#">View details &raquo;</a>
+		</div>
+		<!--/span-->
+	</div>
+	<!--/row-->
+	<div class="row-fluid" data-bind="if: !<%= data.ordersFunc %>.length">
+		<div class="span12">
+			<h2>No "<%= data.status %>" orders found!</h2>
+		</div>
+	</div>
+	<!--/row-->
+</div>
+<!--/span-->
+</script>

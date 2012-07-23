@@ -2,37 +2,68 @@
     ViewBag.Title = "Home Page";
 }
 
-@section navigation {
-	<div class="well sidebar-nav">
-		<ul class="nav nav-list">
-			<li class="nav-header">Overview</li>
-			<li class="active"><a href="#">Link</a></li>
-			<li><a href="#">Link</a></li>
-			<li><a href="#">Link</a></li>
-			<li><a href="#">Link</a></li>
-			<li class="nav-header">Products</li>
-			<li><a href="#">Link</a></li>
-			<li><a href="#">Link</a></li>
-		</ul>
-	</div>
-	<!--/.well -->
-}
 @section scripts {
+	<script type="text/javascript" src="../../Scripts/knockout-2.0.0.js"></script>
+	<script type="text/javascript">
+		ko.underscoreTemplateEngine = function () { }
+		ko.underscoreTemplateEngine.prototype = ko.utils.extend(new ko.templateEngine(), {
+			renderTemplateSource: function (templateSource, bindingContext, options) {
+				// Precompile and cache the templates for efficiency
+				var precompiled = templateSource['data']('precompiled');
+				if (!precompiled) {
+					precompiled = _.template("<% with($data) { %> " + templateSource.text() + " <% } %>");
+					templateSource['data']('precompiled', precompiled);
+				}
+				// Run the template and parse its output into an array of DOM elements
+				var renderedMarkup = precompiled(bindingContext).replace(/\s+/g, " ");
+				return ko.utils.parseHtmlFragment(renderedMarkup);
+			},
+			createJavaScriptEvaluatorBlock: function (script) {
+				return "<%= " + script + " %>";
+			}
+		});
+		ko.setTemplateEngine(new ko.underscoreTemplateEngine());
+	</script>
+	<script type="text/javascript" src="../../Scripts/signals.js"></script>
+	<script type="text/javascript" src="../../Scripts/hasher.js"></script>
+	<script type="text/javascript" src="../../Scripts/crossroads.js"></script>
+	<script type="text/javascript" src="../../Scripts/script.js"></script>
+
+	@Html.Partial("_ordersStatusView")
     <script type="text/javascript">
         var objGraph = JSON.parse('@Html.Raw(ViewBag.objGraph)');
         var viewModel = utils.convertToViewModel(objGraph);
-    </script>    
+        
+        (function () {
+        	crossroads.addRoute("orders/status/{status}", function (status) {
+        		var mainBody = $("#mainBody");
+        		console.log(status);
+        		if (utils.orderStatusIndex.indexOf(status) === -1)
+        			return;
+        		var html = $("#ordersStatusView").html();
+        		var parsed = _.template(html, {
+        			ordersFunc: "$root.getOrdersByStatus('" + status + "')",
+					status: status
+        		}, { variable: 'data' });
+        		mainBody.html(parsed);
+        		ko.applyBindings(viewModel);
+        	});
+        })();
+        (function () {
+        	crossroads.routed.add(console.log, console); //log all routes
+
+        	function parseHash(newHash, oldHash) {
+        		crossroads.parse(newHash);
+        	}
+        	hasher.initialized.add(parseHash); //parse initial hash
+        	hasher.changed.add(parseHash); //parse hash changes
+        	hasher.init(); //start listening for history change
+
+        	//update URL fragment generating new history record
+        	hasher.setHash('orders/status/pending');
+        })();
+
+    </script>
 }
-<div class="hero-unit">
-    <h1>Hello, world!</h1>
-    <p>Hello world in a p!!!!.</p>
-    <p><a class="btn btn-primary btn-large">More Hello world &raquo;</a></p>
+<div class="row-fluid" id="mainBody">
 </div>
-<div class="row-fluid">
-    <div class="span4">
-        <h2>Order By </h2>
-        <p>address</p>
-        <p><a class="btn" href="#">View details &raquo;</a></p>
-    </div>
-</div>
-<!--/row-->

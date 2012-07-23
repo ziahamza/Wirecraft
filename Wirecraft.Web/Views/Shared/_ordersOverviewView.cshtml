@@ -1,0 +1,9 @@
+﻿<!--<script type="text/html" id="ordersOverviewView">-->
+<div class="row-fluid" data-bind="foreach: getPendingOrders">
+    <div class="span4">
+        <h2>Order By: <span data-bind="text: $root.getCustomerById(customerID()).name"></span> </h2>
+		  <p>address: <span data-bind="text: address"></span> </p>
+        <p><a class="btn" href="#">View details &raquo;</a></p>
+    </div>
+</div>
+<!--</script>-->
