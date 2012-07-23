@@ -69,3 +69,4 @@ C:\Users\t-hazia\Documents\Visual Studio 2012\Projects\Wirecraft\Wirecraft.Web\b
 C:\Users\t-hazia\Documents\Visual Studio 2012\Projects\Wirecraft\Wirecraft.Web\bin\System.Web.WebPages.Razor.xml
 C:\Users\t-hazia\Documents\Visual Studio 2012\Projects\Wirecraft\Wirecraft.Web\obj\Debug\Wirecraft.Web.dll
 C:\Users\t-hazia\Documents\Visual Studio 2012\Projects\Wirecraft\Wirecraft.Web\obj\Debug\Wirecraft.Web.pdb
+C:\Users\t-hazia\documents\visual studio 2012\Projects\Wirecraft\Wirecraft.Web\obj\Debug\Wirecraft.Web.csprojResolveAssemblyReference.cache

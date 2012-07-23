@@ -20,6 +20,7 @@
 @section scripts {
     <script type="text/javascript">
         var objGraph = JSON.parse('@Html.Raw(ViewBag.objGraph)');
+        var viewModel = utils.convertToViewModel(objGraph);
     </script>    
 }
 <div class="hero-unit">
@@ -33,7 +34,5 @@
         <p>address</p>
         <p><a class="btn" href="#">View details &raquo;</a></p>
     </div>
-	
-
 </div>
 <!--/row-->
