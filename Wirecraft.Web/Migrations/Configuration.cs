@@ -192,25 +192,33 @@ namespace Wirecraft.Web.Migrations
                 {
                     name = "Hamza Zia",
                     birthDay = new DateTime(1993, 12, 04),
-                    timeStamp = DateTime.Now.Date
+                    timeStamp = DateTime.Now.Date,
+                    photoData = wc.DownloadData(@"http://zouchmagazine.com/wp-content/uploads/2011/01/anonymous-mask2-300x242.jpg"),
+                    photoName = "image.jpg"
                 },
                 new Customer
                 {
                     name = "Tom",
                     birthDay = new DateTime(1992, 09, 14),
-                    timeStamp = DateTime.Now.Date
+                    timeStamp = DateTime.Now.Date,
+                    photoData = wc.DownloadData(@"http://www4.plymouth.ac.uk/staffphotos/tperfect.jpg"),
+                    photoName = "image.jpg"
                 },
                 new Customer
                 {
                     name = "Kenny",
                     birthDay = new DateTime(1992, 07, 14),
-                    timeStamp = DateTime.Now.Date
+                    timeStamp = DateTime.Now.Date,
+                    photoData = wc.DownloadData(@"http://images.hollywood.com/site/heatherington.jpg"),
+                    photoName = "image.jpg"
                 },
                 new Customer
                 {
                     name = "Jenny",
                     birthDay = new DateTime(1991, 12, 08),
-                    timeStamp = DateTime.Now.Date
+                    timeStamp = DateTime.Now.Date,
+                    photoData = wc.DownloadData(@"http://a0.twimg.com/profile_images/1531678435/ZZ_WEB.JPG"),
+                    photoName = "image.jpg"
                 }
             );
 

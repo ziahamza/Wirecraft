@@ -1,0 +1,35 @@
+﻿<script type="text/html" id="productsOverviewView">
+<div class="span3">
+	<div class="well sidebar-nav">
+		<ul class="nav nav-list">
+			<li class="nav-header">Products</li>
+			<li class="active"><a href="#/products/overview">All Products</a></li>
+			<li><a href="#/orders/status/completed">Add Product</a></li>
+			<li><a href="#/orders/status/stopped">Search Products</a></li>
+		</ul>
+	</div>
+	<!--/.well -->
+</div>
+<!--/span-->
+<div class="span9">
+    <div class="row-fluid" data-bind="foreach: <%= data.productsFunc %>"> 
+		<div class="span4">
+			<h2><span data-bind="text: name"></span></h2>
+            <img width="150" data-bind="attr: { src: $root.getProductImage(productID()) }" />
+			<div data-bind="text: description"></div>
+			<div>Price: <b data-bind="text: '$' + price()"></b></div>
+			<a class="btn" href="#">View details &raquo;</a>
+			<a class="btn" href="#"><i class="icon-edit"></i> Edit</a>
+		</div>
+		<!--/span-->
+	</div>
+	<!--/row-->
+	<div class="row-fluid" data-bind="if: !<%= data.productsFunc %>().length">
+		<div class="span12">
+			<h2>No products found!</h2>
+		</div>
+	</div>
+	<!--/row-->
+</div>
+<!--/span-->
+</script>

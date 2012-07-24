@@ -9,8 +9,11 @@ namespace Wirecraft.Web.Logic
 {
     public class DataAccess
     {
+        public Data.SqlDbContext db { get; set; }
+        public DataAccess() {
+            db = new Data.SqlDbContext();
+        }
         public string getDataGraph() {
-            Data.SqlDbContext db = new Data.SqlDbContext();
             var orders = db.orders
                 .Select(x => new Models.Order
                 {
@@ -63,5 +66,37 @@ namespace Wirecraft.Web.Logic
             });
 
         }
+
+        public Web.Data.Blob getBlobById(int id, BlobType type)
+        {
+            return db.blobs
+                .Where(x => x.blobID == id && x.type == type)
+                .FirstOrDefault();
+        }
+
+        public Data.Customer getCustomerByID(int id) {
+            return db.customers
+                .Where(x => x.customerID == id)
+                .FirstOrDefault();
+        }
+
+        public void updateCustomerPhoto(int id, byte[] photo, string name)
+        {
+            var customer = db.customers
+                .Where(x => x.customerID == id).SingleOrDefault();
+            customer.photoData = photo;
+            customer.photoName = name;
+            customer.timeStamp = DateTime.Now.Date;
+            db.SaveChanges();
+        }
+        public void updateCustomer(Wirecraft.Web.Models.Customer customer) {
+            var oldCustomer = db.customers
+                .Where(x => x.customerID == customer.customerID)
+                .SingleOrDefault();
+            oldCustomer.birthDay = customer.birthDay.Date;
+            oldCustomer.name = customer.name;
+            db.SaveChanges();
+        }
+
     }
 }

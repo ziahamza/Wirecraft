@@ -1,7 +1,10 @@
 ﻿@{
     ViewBag.Title = "Home Page";
 }
-
+@section css {
+    <link rel="stylesheet" type="text/css" href="../../css/datepicker.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/fileuploader.css" />
+}
 @section scripts {
 	<script type="text/javascript" src="../../Scripts/knockout-2.0.0.js"></script>
 	<script type="text/javascript">
@@ -24,20 +27,77 @@
 		});
 		ko.setTemplateEngine(new ko.underscoreTemplateEngine());
 	</script>
+    <script type="text/javascript" src="../../Scripts/bootstrap-datepicker.js"></script>
 	<script type="text/javascript" src="../../Scripts/signals.js"></script>
 	<script type="text/javascript" src="../../Scripts/hasher.js"></script>
 	<script type="text/javascript" src="../../Scripts/crossroads.js"></script>
 	<script type="text/javascript" src="../../Scripts/script.js"></script>
+    <script type="text/javascript" src="../../Scripts/fileuploader.js"></script>
+    <script type="text/javascript" src="../../Scripts/jquery.signalR-0.5.2.js"></script>
+    <script type="text/javascript" src="/signalr/hubs"></script>
 
 	@Html.Partial("_ordersStatusView")
+    @Html.Partial("_productsOverviewView")
+
+    @Html.Partial("_customersOverviewView")
+    @Html.Partial("_customerDetailView")
+    @Html.Partial("_customerEditView")
+
     <script type="text/javascript">
         var objGraph = JSON.parse('@Html.Raw(ViewBag.objGraph)');
         var viewModel = utils.convertToViewModel(objGraph);
+        var dataAccessHub = $.connection.dataAccessHub;
         
         (function () {
-        	crossroads.addRoute("orders/status/{status}", function (status) {
+            var changeSet = ["add", "delete", "update"];
+            dataAccessHub.updateModel = function (changes) {
+                _.each(changes, function (e) {
+                    var operation = changeSet[e.op];
+                    var data = e.data;
+                    if (operation === "add") {
+                        (function (tables) {
+                            _.each(tables, function (table) {
+                                _.each(data[table], function (e) {
+                                    viewModel[table].push(utils.getObservableObject(e));
+                                });
+                            });
+                        })(["blobs", "customers", "orders", "products"]);
+                    }
+                    else if (operation === "delete") {
+                        (function (tables) {
+                            _.each(tables, function (table) {
+                                _.each(data[table], function (e) {
+                                    viewModel[table].remove(function (k) {
+                                        return k[table + "ID"]() === e[table + "ID"];
+                                    });
+                                });
+                            });
+                        })(["blobs", "customers", "orders", "products"]);
+                    }
+                    else if (operation === "update") {
+
+                        (function (tables) {
+                            //first remove then all
+                            _.each(tables, function (table) {
+                                _.each(data[table], function (e) {
+                                    viewModel[table].remove(function (k) {
+                                        return k[table + "ID"]() === e[table + "ID"];
+                                    });
+                                });
+                            });
+                        })(["blobs", "customers", "orders", "products"]);
+                    }
+                    else {
+                        console.log("Unknown operation from the server!!!!");
+                    }
+                });
+            }
+        })();
+        (function () {
+            crossroads.addRoute("orders/status/{status}", function (status) {
+                $(".nav-collapse .nav li").removeClass("active");
+                $('.nav li a[href="#/orders/status/pending"]').parent().addClass("active");
         		var mainBody = $("#mainBody");
-        		console.log(status);
         		if (utils.orderStatusIndex.indexOf(status) === -1)
         			return;
         		var html = $("#ordersStatusView").html();
@@ -48,20 +108,100 @@
         		mainBody.html(parsed);
         		ko.applyBindings(viewModel);
         	});
-        })();
-        (function () {
-        	crossroads.routed.add(console.log, console); //log all routes
 
-        	function parseHash(newHash, oldHash) {
-        		crossroads.parse(newHash);
-        	}
-        	hasher.initialized.add(parseHash); //parse initial hash
-        	hasher.changed.add(parseHash); //parse hash changes
-        	hasher.init(); //start listening for history change
+            crossroads.addRoute("products/overview", function () {
+                $(".nav-collapse .nav li").removeClass("active");
+                $('.nav li a[href="#/products/overview"]').parent().addClass("active");
+        	    var mainBody = $("#mainBody");
+        	    var html = $("#productsOverviewView").html();
+        	    var parsed = _.template(html, {
+                    productsFunc: "products"
+        	    }, { variable: "data" });
+        	    mainBody.html(parsed);
+        	    ko.applyBindings(viewModel, mainBody[0]);
+            });
 
-        	//update URL fragment generating new history record
-        	hasher.setHash('orders/status/pending');
+            crossroads.addRoute("customers/overview", function () {
+                $(".nav-collapse .nav li").removeClass("active");
+                $('.nav li a[href="#/customers/overview"]').parent().addClass("active");
+                var mainBody = $("#mainBody");
+                var html = $("#customersOverviewView").html();
+                var parsed = _.template(html, {
+                    customersFunc: "customers"
+                }, { variable: "data" });
+                mainBody.html(parsed);
+                ko.applyBindings(viewModel, mainBody[0]);
+            });
+
+            crossroads.addRoute("customer/id/{id}", function (id) {
+                $(".nav-collapse .nav li").removeClass("active");
+                $('.nav li a[href="#/customers/overview"]').parent().addClass("active");
+                var mainBody = $("#mainBody");
+                var html = $("#customerDetailView").html();
+                var parsed = _.template(html, {
+                    customerID: id
+                }, { variable: "data" });
+                mainBody.html(parsed);
+                ko.applyBindings(viewModel, mainBody[0]);
+            });
+
+            crossroads.addRoute("customer/edit/{id}", function (id) {
+                $(".nav-collapse .nav li").removeClass("active");
+                $('.nav li a[href="#/customers/overview"]').parent().addClass("active");
+                var mainBody = $("#mainBody");
+                var html = $("#customerEditView").html();
+                var parsed = _.template(html, {
+                    customerID: id
+                }, { variable: "data" });
+                mainBody.html(parsed);
+                ko.applyBindings(viewModel, mainBody[0]);
+                $('.datePicker').datepicker();
+
+                var uploader = new qq.FileUploader({
+                    element: document.getElementById('customerPhoto'),
+                    action: '/customer/uploadPhoto/' + id,
+                    debug: true
+                });
+
+                $("#saveCustomer").click(function () {
+                    var customer = {
+                        birthDay: (new Date($('#customerBirthDay').val())).toJSON(),
+                        name: $('#customerName').val(),
+                        customerID: id
+                    };
+                    console.log(customer);
+                    $.ajax({
+                        url: "customer/update",
+                        data: customer,
+                        type: "post",
+                        success: function () {
+                            document.location.href = '#/customer/id/' + id;
+                        },
+                        error: function () {
+                            alert("some error occured processing the request!!");
+                            document.location.href = '#/customer/id/' + id;
+                        }
+                    });
+
+                    return false;
+                });
+            });
         })();
+        $.connection.hub.start(function () {
+            (function () {
+                //crossroads.routed.add(console.log, console); log all routes
+
+                function parseHash(newHash, oldHash) {
+                    crossroads.parse(newHash);
+                }
+                hasher.initialized.add(parseHash); //parse initial hash
+                hasher.changed.add(parseHash); //parse hash changes
+                hasher.init(); //start listening for history change
+
+                //update URL fragment generating new history record
+                hasher.setHash('orders/status/pending');
+            })();
+        });
 
     </script>
 }

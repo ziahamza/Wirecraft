@@ -5,3 +5,8 @@
 .sidebar-nav {
   padding: 9px 0;
 }
+.listItem {
+    margin-left:0px; 
+    margin-bottom:5px; 
+    padding:5px;
+}

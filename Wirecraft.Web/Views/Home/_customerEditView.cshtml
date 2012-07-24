@@ -1,0 +1,53 @@
+﻿<script type="text/html" id="customerEditView">
+<div class="span3">
+	<div class="well sidebar-nav">
+		<ul class="nav nav-list">
+			<li class="nav-header">Customers</li>
+			<li><a href="#/customers/overview">View All</a></li>
+			<li><a href="#/customers/add">Add a customer</a></li>
+		</ul>
+	</div>
+	<!--/.well -->
+</div>
+<!--/span-->
+<!-- ko with:  getCustomerById(<%= data.customerID %>) -->
+<div class="span2" style="margin:0px; padding:0px;">
+    <img data-bind="attr: { src: 'customer/image/' + customerID() }"  style="width:100%"/>
+</div>
+<!--/span-->
+<div class="span6" style="margin:0px; padding:10px;">
+    <form class="form-horizontal">
+    <fieldset>
+        <legend>Edit Customer</legend>
+        <div class="control-group">
+          <label class="control-label" for="customerName">Customer Name:</label>
+          <div class="controls">
+           <input type="text" id="customerName" data-bind="attr: { value: name }" class="input-xlarge">
+            <p class="help-block">Enter the customer Full name (optinal)</p>
+          </div>
+          <br />
+
+          <label class="control-label" for="customerBirthDay">Customer Date of birth:</label>
+          <div class="controls">
+           <input type="text" id="customerBirthDay" data-bind="attr: { value: new Date(birthDay()).getMonth() + '-' + new Date(birthDay()).getDate() + '-' + new Date(birthDay()).getYear() }" data-date-format="mm-dd-yyyy" class="input-xlarge datePicker">
+            <p class="help-block">Enter the customer date of birth (optinal)</p>
+          </div>
+          <br />
+
+          <label class="control-label" for="customerPhoto">Customer phto:</label>
+          <div class="controls">
+           <div id="customerPhoto"></div>
+            <p class="help-block">Select a new customer Photo (optinal)</p>
+          </div>
+        </div>
+    </fieldset>
+    </form>
+    <div>Last Updated: <b data-bind="text: new Date(timeStamp()).toDateString()"></b></div>
+    <br />
+	<a class="btn" id="saveCustomer" data-bind="attr: { href: 'customer/edit/' + customerID() }"> Save</a>
+    <a class="btn" href="#">Delete</a>
+    <br /><br />
+</div>
+<!--/span-->
+<!--/ko-->
+</script>

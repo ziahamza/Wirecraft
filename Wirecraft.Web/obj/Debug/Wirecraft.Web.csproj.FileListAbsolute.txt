@@ -70,3 +70,9 @@ C:\Users\t-hazia\Documents\Visual Studio 2012\Projects\Wirecraft\Wirecraft.Web\b
 C:\Users\t-hazia\Documents\Visual Studio 2012\Projects\Wirecraft\Wirecraft.Web\obj\Debug\Wirecraft.Web.dll
 C:\Users\t-hazia\Documents\Visual Studio 2012\Projects\Wirecraft\Wirecraft.Web\obj\Debug\Wirecraft.Web.pdb
 C:\Users\t-hazia\documents\visual studio 2012\Projects\Wirecraft\Wirecraft.Web\obj\Debug\Wirecraft.Web.csprojResolveAssemblyReference.cache
+C:\Users\t-hazia\Documents\Visual Studio 2012\Projects\Wirecraft\Wirecraft.Web\bin\SignalR.dll
+C:\Users\t-hazia\Documents\Visual Studio 2012\Projects\Wirecraft\Wirecraft.Web\bin\SignalR.Hosting.AspNet.dll
+C:\Users\t-hazia\Documents\Visual Studio 2012\Projects\Wirecraft\Wirecraft.Web\bin\SignalR.Hosting.Common.dll
+C:\Users\t-hazia\Documents\Visual Studio 2012\Projects\Wirecraft\Wirecraft.Web\bin\SignalR.xml
+C:\Users\t-hazia\Documents\Visual Studio 2012\Projects\Wirecraft\Wirecraft.Web\bin\SignalR.Hosting.AspNet.xml
+C:\Users\t-hazia\Documents\Visual Studio 2012\Projects\Wirecraft\Wirecraft.Web\bin\SignalR.Hosting.Common.xml

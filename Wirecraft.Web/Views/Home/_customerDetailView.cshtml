@@ -1,0 +1,46 @@
+﻿<script type="text/html" id="customerDetailView">
+<div class="span3">
+	<div class="well sidebar-nav">
+		<ul class="nav nav-list">
+			<li class="nav-header">Customers</li>
+			<li><a href="#/customers/overview">View All</a></li>
+			<li><a href="#/customers/add">Add a customer</a></li>
+		</ul>
+	</div>
+	<!--/.well -->
+</div>
+<!--/span-->
+<!-- ko with:  getCustomerById(<%= data.customerID %>) -->
+<div class="span2" style="margin:0px; padding:0px;">
+    <img data-bind="attr: { src: 'customer/image/' + customerID() }"  style="width:100%"/>
+</div>
+<!--/span-->
+<div class="span6" style="margin:0px; padding:10px;">
+    <h2 data-bind="text: name"></h2>
+    <div>Birth Day: <b data-bind="text: new Date(birthDay()).toDateString()"></b></div>
+    <div>Last Updated: <b data-bind="text: new Date(timeStamp()).toDateString()"></b></div>
+    <br />
+	<a class="btn" data-bind="attr: { href: '#/customer/edit/' + customerID() }"><i class="icon-edit"></i> Edit</a>
+    <a class="btn" href="#">Delete</a>
+    <br /><br />
+    <h2>Orders By <span data-bind="text: name"></span></h2>
+    <div class="row-fluid" data-bind="foreach: $root.getCustomerOrders(customerID())">
+        <div class="span4" style="margin:0px; padding:10px;">
+			<div>Address: <span data-bind="text: address"></span></div>
+			<div>Total Price: <b data-bind="text: '$' +  $root.getOrderPrice($data)"></b></div>
+			<a class="btn" href="#">View details &raquo;</a>
+			<a class="btn" href="#"><i class="icon-edit"></i> Edit</a>
+		</div>
+		<!--/span-->
+    </div>
+    
+    <div class="row-fluid" data-bind="visible: ($root.getCustomerOrders(customerID()).length <= 0)">
+        <div class="span4" style="margin:0px; padding:10px;">
+			<p>No orders yet!!</p>
+		</div>
+		<!--/span-->
+    </div>
+</div>
+<!--/span-->
+<!--/ko-->
+</script>

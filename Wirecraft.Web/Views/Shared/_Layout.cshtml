@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
     @Styles.Render("~/css/bootstrap.css", "~/css/bootstrap-responsive.css", "~/css/Site.css")
+    @RenderSection("css", required: false)
 </head>
 <body>
     <div class="navbar navbar-fixed-top">
@@ -30,8 +31,8 @@
             <div class="nav-collapse">
                 <ul class="nav">
                     <li class="active"><a href="#/orders/status/pending">Orders</a></li>
-                    <li><a href="#about">Products</a></li>
-                    <li><a href="#contact">Customers</a></li>
+                    <li><a href="#/products/overview">Products</a></li>
+                    <li><a href="#/customers/overview">Customers</a></li>
                 </ul>
             </div>
             <!--/.nav-collapse -->
