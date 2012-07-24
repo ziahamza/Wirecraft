@@ -131,9 +131,6 @@ namespace Wirecraft.Web.Migrations
 
             ctx.SaveChanges();
 
-
-
-
         }
 
         public void addProductDocs(SqlDbContext ctx) {

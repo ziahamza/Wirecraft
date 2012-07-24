@@ -1,0 +1,68 @@
+﻿<script type="text/html" id="productEditView">
+<div class="span3">
+	<div class="well sidebar-nav">
+		<ul class="nav nav-list">
+			<li class="nav-header">Products</li>
+			<li><a href="#/products/overview">All Products</a></li>
+			<li><a href="#/orders/status/completed">Add Product</a></li>
+			<li><a href="#/orders/status/stopped">Search Products</a></li>
+		</ul>
+	</div>
+	<!--/.well -->
+</div>
+<!--/span-->
+<div class="span9"">
+	<form class="form-horizontal">
+    <fieldset>
+        <legend>Edit Customer</legend>
+        <div class="control-group">
+          <label class="control-label" for="productName">Product Name:</label>
+          <div class="controls"  data-bind="with: getProductById(<%= data.productID %>)">
+           <input type="text" id="productName" data-bind="attr: { value: name }" class="input-xlarge">
+            <p class="help-block">Enter the official product name (optional)</p>
+          </div>
+          <br />
+
+          <label class="control-label" for="productPrice">Product Price:</label>
+          <div class="controls"  data-bind="with: getProductById(<%= data.productID %>)">
+           $<input type="text" id="productPrice" data-bind="attr: { value: price }" class="input-xlarge">
+            <p class="help-block">Enter the product price (optional)</p>
+          </div>
+          <br />
+		  
+          <label class="control-label" for="productDescription">Product Description:</label>
+          <div class="controls"  data-bind="with: getProductById(<%= data.productID %>)">
+           <textarea id="productDescription" data-bind="text: description"></textarea>
+            <p class="help-block">Enter the product description</p>
+          </div>
+          <br />
+		  
+          <label class="control-label" for="productFile">Add related file:</label>
+          <div class="controls">
+		   <select id="productFileType">
+		     <option value="0">Image</option>
+		     <option value="1">Document</option>
+		     <option value="2">Video</option>
+		     <option value="3">Other</option>
+		   </select><br />
+           <div id="productFile"></div>
+            <p class="help-block">Enter the product description</p>
+          </div>
+        </div>
+
+    </fieldset>
+    </form>
+	 
+	<a class="btn" href="#">Save Product</a>
+	<a class="btn" href="#">Delete Product</a>
+	<br />
+	<div class="row-fluid" data-bind="foreach: $root.getProductImages(<%= data.productID %>)">
+		<div class="span4 listItem" style="text-align:center;" >
+			<img data-bind="attr: { src: href }" style="height:100px; margin:10px;"/>
+			<br />
+			<a class="btn" data-bind="click: $root.deleteBlob(blobID)">Delete Image</a>
+		</div>
+	</div>
+</div>
+<!--/span-->
+</script>

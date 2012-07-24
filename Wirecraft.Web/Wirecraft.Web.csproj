@@ -149,6 +149,7 @@
     <Compile Include="Controllers\BlobController.cs" />
     <Compile Include="Controllers\CustomerController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ProductController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -235,6 +236,9 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\Shared\_navigation.cshtml" />
+    <Content Include="Views\Home\_orderDetailView.cshtml" />
+    <Content Include="Views\Home\_productDetailView.cshtml" />
+    <Content Include="Views\Home\_productEditView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

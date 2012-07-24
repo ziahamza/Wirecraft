@@ -7,8 +7,5 @@ using SignalR.Hubs;
 namespace Wirecraft.Web.Hubs
 {
     public class DataAccessHub : Hub {
-        public int add(int x, int y) {
-            return x + y;
-        }
     }
 }

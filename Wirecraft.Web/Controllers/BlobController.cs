@@ -24,5 +24,11 @@ namespace Wirecraft.Web.Controllers
             var type = "image/" + Path.GetExtension(blob.name).Substring(1);
             return new FileContentResult(blob.data, type);
         }
+
+		public ActionResult delete(int id) {
+			DataAccess da = new DataAccess();
+			da.deleteBlob(id);
+			return Json(new { success = true });
+		}
     }
 }

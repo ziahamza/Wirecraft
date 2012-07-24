@@ -14,7 +14,7 @@
     <div class="row-fluid" data-bind="foreach: <%= data.customersFunc %>"> 
 		<div class="span3 listItem">
 			<h2><span data-bind="text: name"></span></h2>
-            <img height="150" data-bind="attr: { src: 'customer/image/' + customerID() }" />
+            <img height="150" data-bind="attr: { src: 'customer/image/' + customerID() + '#' + photoName() }" />
 			<div>Birth Day: <b data-bind="text: new Date(birthDay()).toDateString()"></b></div>
 			<a class="btn" data-bind="attr: { href: '#/customer/id/' + customerID() }">View details &raquo;</a>
 			<a class="btn" data-bind="attr: { href: '#/customer/edit/' + customerID() }"><i class="icon-edit"></i> Edit</a>

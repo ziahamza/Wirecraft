@@ -76,3 +76,9 @@ C:\Users\t-hazia\Documents\Visual Studio 2012\Projects\Wirecraft\Wirecraft.Web\b
 C:\Users\t-hazia\Documents\Visual Studio 2012\Projects\Wirecraft\Wirecraft.Web\bin\SignalR.xml
 C:\Users\t-hazia\Documents\Visual Studio 2012\Projects\Wirecraft\Wirecraft.Web\bin\SignalR.Hosting.AspNet.xml
 C:\Users\t-hazia\Documents\Visual Studio 2012\Projects\Wirecraft\Wirecraft.Web\bin\SignalR.Hosting.Common.xml
+C:\Users\Administrator\Desktop\wirecraft\Wirecraft.Web\bin\SignalR.dll
+C:\Users\Administrator\Desktop\wirecraft\Wirecraft.Web\bin\SignalR.Hosting.AspNet.dll
+C:\Users\Administrator\Desktop\wirecraft\Wirecraft.Web\bin\SignalR.Hosting.Common.dll
+C:\Users\Administrator\Desktop\wirecraft\Wirecraft.Web\bin\SignalR.xml
+C:\Users\Administrator\Desktop\wirecraft\Wirecraft.Web\bin\SignalR.Hosting.AspNet.xml
+C:\Users\Administrator\Desktop\wirecraft\Wirecraft.Web\bin\SignalR.Hosting.Common.xml
