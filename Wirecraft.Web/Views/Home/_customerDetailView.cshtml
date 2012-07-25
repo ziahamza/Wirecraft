@@ -4,7 +4,7 @@
 		<ul class="nav nav-list">
 			<li class="nav-header">Customers</li>
 			<li><a href="#/customers/overview">View All</a></li>
-			<li><a href="#/customers/add">Add a customer</a></li>
+			<li><a href="#" data-bind="click: addCustomer">Add a customer</a></li>
 		</ul>
 	</div>
 	<!--/.well -->
@@ -21,7 +21,7 @@
     <div>Last Updated: <b data-bind="text: new Date(timeStamp()).toDateString()"></b></div>
     <br />
 	<a class="btn" data-bind="attr: { href: '#/customer/edit/' + customerID() }"><i class="icon-edit"></i> Edit</a>
-    <a class="btn" href="#">Delete</a>
+    <a class="btn" data-bind="click: $root.deleteCustomer.bind(<%= data.customerID %>)">Delete</a>
     <br /><br />
     <h2>Orders By <span data-bind="text: name"></span></h2>
     <div class="row-fluid" data-bind="foreach: $root.getCustomerOrders(customerID())">

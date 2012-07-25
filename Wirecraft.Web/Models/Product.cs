@@ -7,6 +7,12 @@ namespace Wirecraft.Web.Models
 {
     public class Product
     {
+		public Product() {
+			name = "sample name here";
+			price = 0;
+			description = "sample description here";
+			timeStamp = DateTime.Now.Date;
+		}
         public string name { get; set; }
         public int productID { get; set; }
         public double price { get; set; }

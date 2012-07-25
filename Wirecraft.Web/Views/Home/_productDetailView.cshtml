@@ -4,8 +4,7 @@
 		<ul class="nav nav-list">
 			<li class="nav-header">Products</li>
 			<li><a href="#/products/overview">All Products</a></li>
-			<li><a href="#/orders/status/completed">Add Product</a></li>
-			<li><a href="#/orders/status/stopped">Search Products</a></li>
+			<li><a href="#" data-bind="click: addProduct">Add Product</a></li>
 		</ul>
 	</div>
 	<!--/.well -->
@@ -17,7 +16,7 @@
 	<div>Price: <b data-bind="text: '$' + price()"></b></div>
 	<div>Time Stamp: <b data-bind="text: timeStamp"></b></div>
 	<a class="btn" data-bind="attr: { href: '#/product/edit/' + productID() }"><i class="icon-edit"></i> Edit</a>
-	<a class="btn" href="#">Delete</a>
+	<a class="btn" data-bind="click: $root.deleteProduct">Delete</a>
 	<br />
 	<div data-bind="foreach: $root.getProductImages(productID())">
 		<img data-bind="attr: { src: 'blob/imageById/' + blobID() + '#' + name() }" style="height:100px; margin:10px;"/>

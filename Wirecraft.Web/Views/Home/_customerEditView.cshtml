@@ -4,7 +4,7 @@
 		<ul class="nav nav-list">
 			<li class="nav-header">Customers</li>
 			<li><a href="#/customers/overview">View All</a></li>
-			<li><a href="#/customers/add">Add a customer</a></li>
+			<li><a data-bind="click: addCustomer">Add a customer</a></li>
 		</ul>
 	</div>
 	<!--/.well -->
@@ -28,7 +28,7 @@
 
           <label class="control-label" for="customerBirthDay">Customer Date of birth:</label>
           <div class="controls" data-bind="with: $root.getCustomerById(<%= data.customerID %>)">
-           <input type="text" id="customerBirthDay" data-bind="attr: { value: (new Date(birthDay()).getMonth() + 1) + '/' + (new Date(birthDay())).getDate() + '/' + (new Date(birthDay())).getYear() }" data-date-format="mm/dd/yyyy" class="input-xlarge datePicker">
+           <input type="text" id="customerBirthDay" data-bind="attr: { value: (new Date(birthDay()).getMonth() + 1) + '/' + (new Date(birthDay())).getDate() + '/' + (new Date(birthDay())).getFullYear() }" data-date-format="mm/dd/yyyy" class="input-xlarge datePicker">
             <p class="help-block">Enter the customer date of birth (optinal)</p>
           </div>
           <br />
@@ -45,7 +45,7 @@
     <div data-bind="with: $root.getCustomerById(<%= data.customerID %>)">Last Updated: <b data-bind="text: new Date(timeStamp()).toDateString()"></b></div>
     <br />
 	<a class="btn" id="saveCustomer"> Save</a>
-    <a class="btn" href="#">Delete</a>
+    <a class="btn" data-bind="click: $root.deleteCustomer.bind($root, <%= data.customerID %>)">Delete</a>
     <br /><br />
 </div>
 <!--/span-->

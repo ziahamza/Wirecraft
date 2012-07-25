@@ -6,6 +6,8 @@
 			<li><a href="#/orders/status/pending">Pending Orders</a></li>
 			<li><a href="#/orders/status/completed">Completed Orders</a></li>
 			<li><a href="#/orders/status/stopped">Stopped Orders</a></li>
+			<li><a data-bind="click: addOrder">Add Order</a></li>
+
 		</ul>
 	</div>
 	<!--/.well -->
@@ -80,7 +82,7 @@
     <br /><br />
     <div>
 	    <a class="btn" data-bind="click: $root.saveOrder">Save Order</a>
-	    <a class="btn">Delete order</a>
+	    <a class="btn" data-bind="click: $root.deleteOrder">Delete order</a>
     </div>
 	<br />
 

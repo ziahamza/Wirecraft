@@ -56,5 +56,23 @@ namespace Wirecraft.Web.Controllers
             return Json(new { success = true });
         }
 
+		[HttpPost]
+		public ActionResult add()
+		{
+			DataAccess da = new DataAccess();
+			Customer customer = da.newCustomer();
+
+			return Json(customer);
+		}
+
+		[HttpPost]
+		public ActionResult delete(int id)
+		{
+			DataAccess da = new DataAccess();
+			da.deleteCustomer(id);
+
+			return Json(new { success = true });
+		}
+
     }
 }

@@ -4,8 +4,7 @@
 		<ul class="nav nav-list">
 			<li class="nav-header">Products</li>
 			<li><a href="#/products/overview">All Products</a></li>
-			<li><a href="#/orders/status/completed">Add Product</a></li>
-			<li><a href="#/orders/status/stopped">Search Products</a></li>
+			<li><a data-bind="click: addProduct" href="#">Add Product</a></li>
 		</ul>
 	</div>
 	<!--/.well -->
@@ -55,7 +54,7 @@
 	 
     <div data-bind="with: getProductById(<%= data.productID %>)" >
 	    <a class="btn" data-bind="click: $root.saveProduct">Save Product</a>
-	    <a class="btn">Delete Product</a>
+	    <a class="btn" data-bind="click: $root.deleteProduct">Delete Product</a>
     </div>
 	<br />
 	<div class="row-fluid" data-bind="foreach: $root.getProductImages(<%= data.productID %>)">
@@ -82,7 +81,7 @@
                 <td data-bind="text: $root.getFileType(type())"></td>
                 <td><a data-bind="attr: { href: 'blob/fileByName/' + name() }">Download</a></td>
                 <td data-bind="text: new Date(timeStamp()).toDateString()"></td>
-                <td><a class="btn" data-bind="click: $root.deleteBlob">Download</a></td>
+                <td><a class="btn" data-bind="click: $root.deleteBlob">Delete File</a></td>
             </tr>
         </tbody>
 	</table>

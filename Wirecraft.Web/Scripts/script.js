@@ -8,8 +8,11 @@ var utils = {
 	        if (Object.prototype.toString.call(obj[entity]) === '[object Array]') {
 	            observableEntity[entity] = ko.observableArray(obj[entity].map(ko.observable));
 	        }
+	        else if (obj[entity] === null) {
+	        	observableEntity[entity] = ko.observableArray([]);
+	        }
 	        else {
-	            observableEntity[entity] = ko.observable(obj[entity]);
+	        	observableEntity[entity] = ko.observable(obj[entity]);
 	        }
 	    }
 	    return observableEntity;
@@ -104,12 +107,17 @@ var utils = {
         }, viewModel);
 
         viewModel.getProductImages = _.bind(function (id) {
-            return _.chain(this.getProductById(id).fileIDs())
-                .map(function (e) { return e(); })
+        	var fileIDs = this.getProductById(id).fileIDs();
+        	if (fileIDs.length) {
+        		return _.chain(fileIDs)
+        		.map(function (e) { return e(); })
                 .map(this.getBlobById)
                 .filter(function (e) {
-                    return utils.blobTypeIndex[e.type()] === "image";
+                	return utils.blobTypeIndex[e.type()] === "image";
                 }).value();
+        	} else {
+        		return [];
+        	}
         }, viewModel);
 
         viewModel.getProductNonImages = _.bind(function (id) {
@@ -196,8 +204,8 @@ var utils = {
                     productID: productID,
                     quantity: quantity
                 },
-                success: console.log,
-                error: console.log
+                success: function () { },
+                error: function (ex) { console.log(ex); }
             });
         }, viewModel);
 
@@ -235,6 +243,92 @@ var utils = {
                 'Other'
             ][type];
         }, viewModel);
+
+        viewModel.addOrder = _.bind(function () {
+        	$.ajax({
+        		url: 'order/add',
+        		type: 'post',
+        		success: function (data) {
+        			var id = data.orderID;
+        			document.location.href = '#/order/edit/' + id;
+        		},
+        		error: function (err) {
+        			console.log(err);
+        		}
+        	});
+        });
+
+        viewModel.addCustomer = _.bind(function () {
+        	$.ajax({
+        		url: 'customer/add',
+        		type: 'post',
+        		success: function (data) {
+        			var id = data.customerID;
+        			document.location.href = '#/customer/edit/' + id;
+        		},
+        		error: function (err) {
+        			console.log(err);
+        		}
+        	});
+        });
+
+
+        viewModel.deleteOrder = _.bind(function (order) {
+        	$.ajax({
+        		url: 'order/delete/' + order.orderID(),
+        		type: 'post',
+        		success: function () {
+        			document.location.href = '#/orders/status/pending';
+        		},
+        		error: function (err) {
+        			console.log(err);
+        			document.location.href = '#/orders/status/pending';
+        		}
+        	});
+        });
+
+        viewModel.deleteProduct = _.bind(function (product) {
+        	$.ajax({
+        		url: 'product/delete/' + product.productID(),
+        		type: 'post',
+        		success: function () {
+        			document.location.href = '#/products/overview';
+        		},
+        		error: function (err) {
+        			console.log(err);
+        			document.location.href = '#/products/overview';
+        		}
+        	});
+        });
+
+        viewModel.deleteCustomer = _.bind(function (id) {
+        	console.log(id);
+        	$.ajax({
+        		url: 'customer/delete/' + id,
+        		type: 'post',
+        		success: function () {
+        			document.location.href = '#/customers/overview';
+        		},
+        		error: function (err) {
+        			console.log(err);
+        			document.location.href = '#/customers/overview';
+        		}
+        	});
+        });
+
+        viewModel.addProduct = _.bind(function () {
+        	$.ajax({
+        		url: 'product/add',
+        		type: 'post',
+        		success: function (data) {
+        			document.location.href = '#/product/edit/' + data.productID;
+        		},
+        		error: function (err) {
+        			console.log(err);
+        			alert("Error occured!!");
+        		}
+        	});
+        });
         return viewModel;
     }
 };

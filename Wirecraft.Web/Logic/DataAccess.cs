@@ -151,7 +151,7 @@ namespace Wirecraft.Web.Logic
         }
 
 
-        internal void addProductBlob(int id, byte[] file, int type, string fileName)
+        public void addProductBlob(int id, byte[] file, int type, string fileName)
         {
             var product = db.products.Where(x => x.productID == id).SingleOrDefault();
 
@@ -395,5 +395,191 @@ namespace Wirecraft.Web.Logic
 				}
 			});
         }
-    }   
+
+		public Models.Order newOrder()
+		{
+			Models.Order order = new Models.Order();
+
+			Data.Order dOrder = new Data.Order{
+				customerID = order.customerID,
+				discount = order.discount,
+				address = order.address,
+				status = order.status,
+				timeStamp = order.timeStamp,
+				orderDate = order.orderDate
+			};
+
+			db.orders.Add(dOrder);
+			db.SaveChanges();
+		
+			order.orderID = dOrder.orderID;
+
+			var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
+			ctx.Clients.updateModel(new[]{
+				new {
+					op = "add",
+					data = new {
+						customers = new Models.Customer[0],
+						products = new Models.Product[0],
+						blobs = new Models.Blob[0],
+						orders = new [] {
+							order
+						}
+						
+					}
+				}
+			});
+			return order;
+		}
+
+		public void deleteOrder(int orderID)
+		{
+			var order = db.orders.Where(x => x.orderID == orderID).Single();
+			var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
+			ctx.Clients.updateModel(new[]{
+				new {
+					op = "delete",
+					data = new {
+						customers = new Models.Customer[0],
+						products = new Models.Product[0],
+						blobs = new Models.Blob[0],
+						orders = new Models.Order[] {
+							new Models.Order {
+								orderID = orderID
+							}
+						}
+						
+					}
+				}
+			});
+
+			db.orders.Remove(order);
+			db.SaveChanges();
+		}
+
+		public Models.Customer newCustomer()
+		{
+			Models.Customer customer = new Models.Customer();
+			var dCustomer = new Data.Customer {
+				birthDay = customer.birthDay,
+				name = customer.name,
+				photoName = customer.photoName,
+				timeStamp = customer.timeStamp
+			};
+
+			db.customers.Add(dCustomer);
+			db.SaveChanges();
+
+			customer.customerID = dCustomer.customerID;
+			var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
+			ctx.Clients.updateModel(new[]{
+				new {
+					op = "add",
+					data = new {
+						orders = new Models.Order[0],
+						products = new Models.Product[0],
+						blobs = new Models.Blob[0],
+						customers = new Models.Customer[] {
+							customer
+						}
+						
+					}
+				}
+			});
+			return customer;
+		}
+
+		public void deleteCustomer(int id)
+		{
+			var customer = db.customers.Where(x => x.customerID == id)
+				.Single();
+
+			db.customers.Remove(customer);
+
+			var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
+			ctx.Clients.updateModel(new[]{
+				new {
+					op = "delete",
+					data = new {
+						orders = new Models.Order[0],
+						products = new Models.Product[0],
+						blobs = new Models.Blob[0],
+						customers = new Models.Customer[] {
+							new Models.Customer{
+								customerID = customer.customerID,
+								birthDay = customer.birthDay,
+								name = customer.name,
+								timeStamp = customer.timeStamp,
+								photoName = customer.photoName
+							}
+						}
+						
+					}
+				}
+			});
+
+			db.SaveChanges();
+		}
+
+		public Models.Product newProduct()
+		{
+			Models.Product product = new Models.Product();
+			var newProd = new Data.Product {
+				name = product.name,
+				description = product.description,
+				price = product.price,
+				timeStamp = product.timeStamp
+			};
+
+			db.products.Add(newProd);
+			db.SaveChanges();
+			product.productID = newProd.productID;
+			var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
+			ctx.Clients.updateModel(new[]{
+				new {
+					op = "add",
+					data = new {
+						orders = new Models.Order[0],
+						customers = new Models.Customer[0],
+						blobs = new Models.Blob[0],
+						products = new Models.Product[] {
+							product
+						}
+						
+					}
+				}
+			});
+
+			return product;
+		}
+
+		public void deleteProduct(int id)
+		{
+			var dProduct = db.products.Where(x => x.productID == id)
+				.Single();
+			db.products.Remove(dProduct);
+			var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
+			ctx.Clients.updateModel(new[]{
+				new {
+					op = "delete",
+					data = new {
+						orders = new Models.Order[0],
+						customers = new Models.Customer[0],
+						blobs = new Models.Blob[0],
+						products = new Models.Product[] {
+							new Models.Product {
+								description = dProduct.description,
+								name = dProduct.name,
+								price = dProduct.price,
+								productID = dProduct.productID,
+								timeStamp = dProduct.timeStamp
+							}
+						}
+						
+					}
+				}
+			});
+			db.SaveChanges();
+		}
+	}   
 }

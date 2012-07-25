@@ -36,5 +36,23 @@ namespace Wirecraft.Web.Controllers
             return Json(new { success = true });
         }
 
+		[HttpPost]
+		public ActionResult add()
+		{
+			DataAccess da = new DataAccess();
+			Order order = da.newOrder();
+
+			return Json(order);
+		}
+
+		[HttpPost]
+		public ActionResult delete(int id)
+		{
+			DataAccess da = new DataAccess();
+			da.deleteOrder(id);
+
+			return Json(new {success = true});
+		}
+
     }
 }
