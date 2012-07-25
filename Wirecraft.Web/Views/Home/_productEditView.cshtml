@@ -14,7 +14,7 @@
 <div class="span9"">
 	<form class="form-horizontal">
     <fieldset>
-        <legend>Edit Customer</legend>
+        <legend>Edit Product</legend>
         <div class="control-group">
           <label class="control-label" for="productName">Product Name:</label>
           <div class="controls"  data-bind="with: getProductById(<%= data.productID %>)">
@@ -25,7 +25,7 @@
 
           <label class="control-label" for="productPrice">Product Price:</label>
           <div class="controls"  data-bind="with: getProductById(<%= data.productID %>)">
-           $<input type="text" id="productPrice" data-bind="attr: { value: price }" class="input-xlarge">
+           <input type="text" id="productPrice" data-bind="attr: { value: price }" class="input-xlarge">
             <p class="help-block">Enter the product price (optional)</p>
           </div>
           <br />
@@ -44,25 +44,48 @@
 		     <option value="1">Document</option>
 		     <option value="2">Video</option>
 		     <option value="3">Other</option>
-		   </select><br />
+		   </select><br /><br />
            <div id="productFile"></div>
-            <p class="help-block">Enter the product description</p>
+            <p class="help-block">Select a file related to product</p>
           </div>
         </div>
 
     </fieldset>
     </form>
 	 
-	<a class="btn" href="#">Save Product</a>
-	<a class="btn" href="#">Delete Product</a>
+    <div data-bind="with: getProductById(<%= data.productID %>)" >
+	    <a class="btn" data-bind="click: $root.saveProduct">Save Product</a>
+	    <a class="btn">Delete Product</a>
+    </div>
 	<br />
 	<div class="row-fluid" data-bind="foreach: $root.getProductImages(<%= data.productID %>)">
 		<div class="span4 listItem" style="text-align:center;" >
-			<img data-bind="attr: { src: href }" style="height:100px; margin:10px;"/>
+			<img data-bind="attr: { src: 'blob/imageById/' + blobID() + '#' + name() }" style="height:100px; margin:10px;"/>
 			<br />
-			<a class="btn" data-bind="click: $root.deleteBlob(blobID)">Delete Image</a>
+			<a class="btn" data-bind="click: $root.deleteBlob">Delete Image</a>
 		</div>
 	</div>
+    <br />
+    <table class="table-bordered table table-striped table-condensed">
+        <thead>
+            <tr>
+                <td>File Name</td>
+                <td>File type</td>
+                <td>Download File</td>
+                <td>Time stamp</td>
+                <td>Operations</td>
+            </tr>
+        </thead>
+        <tbody data-bind="foreach: $root.getProductNonImages(<%= data.productID %>)">
+            <tr>
+                <td data-bind="text: name"></td>
+                <td data-bind="text: $root.getFileType(type())"></td>
+                <td><a data-bind="attr: { href: 'blob/fileByName/' + name() }">Download</a></td>
+                <td data-bind="text: new Date(timeStamp()).toDateString()"></td>
+                <td><a class="btn" data-bind="click: $root.deleteBlob">Download</a></td>
+            </tr>
+        </tbody>
+	</table>
 </div>
 <!--/span-->
 </script>

@@ -21,10 +21,29 @@ namespace Wirecraft.Web.Controllers
         {
             DataAccess da = new DataAccess();
             var blob = da.getBlobById(id, Common.BlobType.Image);
-            var type = "image/" + Path.GetExtension(blob.name).Substring(1);
-            return new FileContentResult(blob.data, type);
+            if (blob != null)
+            {
+                var type = MimeTypes.mimes[Path.GetExtension(blob.name).Substring(1)];
+                return new FileContentResult(blob.data, type);
+            }
+            else {
+                throw new HttpException(404, "blob Image not found!!");
+            }
         }
-
+        public FileContentResult fileByName(string id) {
+            DataAccess da = new DataAccess();
+            var blob = da.getBlobByName(id);
+            if (blob != null)
+            {
+                var type = MimeTypes.mimes[Path.GetExtension(blob.name).Substring(1)];
+                return new FileContentResult(blob.data, type);
+            }
+            else
+            {
+                throw new HttpException(404, "blob file not found!!");
+            }
+        }
+        [HttpPost]
 		public ActionResult delete(int id) {
 			DataAccess da = new DataAccess();
 			da.deleteBlob(id);

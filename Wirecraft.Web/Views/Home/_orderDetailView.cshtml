@@ -3,7 +3,7 @@
 	<div class="well sidebar-nav">
 		<ul class="nav nav-list">
 			<li class="nav-header">Orders</li>
-			<li>><a href="#/orders/status/pending">Pending Orders</a></li>
+			<li><a href="#/orders/status/pending">Pending Orders</a></li>
 			<li><a href="#/orders/status/completed">Completed Orders</a></li>
 			<li><a href="#/orders/status/stopped">Stopped Orders</a></li>
 		</ul>
@@ -11,24 +11,48 @@
 	<!--/.well -->
 </div>
 <!--/span-->
-<div class="span9">
-    <div class="row-fluid" data-bind="foreach: <%= data.ordersFunc %>"> 
+<div class="span9" data-bind="with: getOrderById(<%= data.orderID %>)">
+    <div data-bind="with: $root.getCustomerById(customerID())">
+        <h1>Customer Details</h1>
+		<h2><span data-bind="text: name"></span></h2>
+        <img height="150" data-bind="attr: { src: 'customer/image/' + customerID() + '#' + photoName() }" />
+		<div>Birth Day: <b data-bind="text: new Date(birthDay()).toDateString()"></b></div>
+		<a class="btn" data-bind="attr: { href: '#/customer/id/' + customerID() }">View Customer Details &raquo;</a>
+		<a class="btn" data-bind="attr: { href: '#/customer/edit/' + customerID() }"><i class="icon-edit"></i> Edit Customer</a>
+    </div>
+    <br />
+
+    <h1>Order Details</h1>
+	<div>Address: <span data-bind="text: address"></span></div>
+    <div>Order Discount: <b data-bind="text: '$' +  discount()"></b></div>
+	<div>Total Price: <b data-bind="text: '$' +  $root.getOrderPrice($data)"></b></div>
+    <br />
+
+    <h1>Order Products</h1>
+    <div class="row-fluid" data-bind="foreach: $root.getOrderProducts($data)"> 
 		<div class="span4 listItem">
-			<h2>Order By: <a data-bind="text: $root.getCustomerById(customerID()).name, attr: {href: '#/customer/id/' + customerID()}"></a></h2>
-			<div data-bind="text: address"></div>
-			<div>Total Price: <b data-bind="text: '$' +  $root.getOrderPrice($data)"></b></div>
-			<a class="btn" href="#">View details &raquo;</a>
-			<a class="btn" href="#"><i class="icon-edit"></i> Edit</a>
+			<h2><span data-bind="text: name"></span></h2>
+            <img height="150" data-bind="attr: { src: $root.getProductImage(productID()) + '#' +  timeStamp() }" />
+			<div data-bind="text: description"></div>
+			<div>Price: <b data-bind="text: '$' + price()"></b></div>
+			<a class="btn" data-bind="attr: { href: '#/product/id/' + productID() }">View details &raquo;</a>
+			<a class="btn" data-bind="attr: { href: '#/product/edit/' + productID() }"><i class="icon-edit"></i> Edit</a>
 		</div>
-		<!--/span-->
+	<!--/span-->
 	</div>
 	<!--/row-->
-	<div class="row-fluid" data-bind="if: !<%= data.ordersFunc %>.length">
+	<div class="row-fluid" data-bind="if: !$root.getOrderProducts($data).length">
 		<div class="span12">
-			<h2>No "<%= data.status %>" orders found!</h2>
+			<h2>No products found in the order!</h2>
 		</div>
 	</div>
 	<!--/row-->
+
+    <br /><br />
+	<a class="btn" href="#">Delete Order</a>
+	<a class="btn" data-bind="attr: { href: '#/order/edit/' + orderID() }"><i class="icon-edit"></i> Edit Order</a>
+
+    <br />
 </div>
 <!--/span-->
 </script>

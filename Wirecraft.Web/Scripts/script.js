@@ -49,6 +49,16 @@ var utils = {
         	return product;
         }, viewModel);
 
+        viewModel.getOrderById = _.bind(function (id) {
+            var order = null;
+            _.each(this.orders(), function (e) {
+                if (e.orderID() === id) {
+                    order = e;
+                }
+            });
+            return order;
+        }, viewModel);
+
         viewModel.getBlobById = _.bind(function (id) {
             var blob = null;
             _.each(this.blobs(), function (e) {
@@ -68,40 +78,46 @@ var utils = {
         viewModel.getOrderPrice = _.bind(function (order) {
         	var that = this;
         	var price = 0;
-        	_.chain(order.productIDs())
-			.map(function (e) {
-				price += that.getProductById(e()).price();
-			})
+        	for (var i = 0; i < order.productIDs().length; i++) {
+        	    price += that.getProductById(order.productIDs()[i]()).price() * order.quantities()[i]();
+        	}
+
         	price -= order.discount();
         	return price;
         }, viewModel);
 
         viewModel.getProductImage = _.bind(function (id) {
-        	if (this.getPoductById(id).fileIDs().length) {
-        		return "blob/imageById/" + _.chain(this.getProductById(id).fileIDs())
-                .map(function (e) { return e(); })
-                .map(this.getBlobById)
-                .filter(function (e) {
-                	return utils.blobTypeIndex[e.type()] === "image";
-                }).first().value().blobID();
-        	}
-        	else {
-        		console.log("images not found!!");
-        		return "error.html";
-        	}
+            var image = _.chain(this.getProductById(id).fileIDs())
+            .map(function (e) { return e(); })
+            .map(this.getBlobById)
+            .filter(function (e) {
+                return utils.blobTypeIndex[e.type()] === "image";
+            }).first().value();
+            if (image) {
+                return "blob/imageById/" + image.blobID();
+            }
+            else {
+                console.log("images not found!!");
+                return "error.html";
+            }
+        	
         }, viewModel);
 
         viewModel.getProductImages = _.bind(function (id) {
-        	return _.chain(this.getProductById(id).fileIDs())
+            return _.chain(this.getProductById(id).fileIDs())
                 .map(function (e) { return e(); })
                 .map(this.getBlobById)
                 .filter(function (e) {
-                	return utils.blobTypeIndex[e.type()] === "image";
-                }).map(function (e) {
-                	return {
-                		href: "blob/imageById/" + e.blobID() + "#" + e.name(),
-                		blobID: e.blobID()
-                	}
+                    return utils.blobTypeIndex[e.type()] === "image";
+                }).value();
+        }, viewModel);
+
+        viewModel.getProductNonImages = _.bind(function (id) {
+            return _.chain(this.getProductById(id).fileIDs())
+                .map(function (e) { return e(); })
+                .map(this.getBlobById)
+                .filter(function (e) {
+                    return utils.blobTypeIndex[e.type()] != "image";
                 }).value();
         }, viewModel);
 
@@ -112,11 +128,113 @@ var utils = {
                 }).value();
         }, (viewModel));
 
-        viewModel.deleteBlob = _.bind(function (blobID) {
+        viewModel.deleteBlob = _.bind(function (blob) {
         	$.ajax({
-        		url: "blob/delete/" + blobID
+        	    url: "blob/delete/" + blob.blobID(),
+                type: "post",
+                success: function (e) { console.log(e); },
+                error: function (e) { console.log(e) }
         	});
-        }, (viewModel));
+        }, viewModel);
+
+        viewModel.saveProduct = _.bind(function (oldProd) {
+            var product = {
+                name: $("#productName").val(),
+                price: $("#productPrice").val(),
+                description: $("#productDescription").val(),
+                productID: oldProd.productID()
+            };
+            console.log(product);
+            $.ajax({
+                url: "product/update",
+                data: product,
+                type: "post",
+                success: function () {
+                    document.location.href = '#/product/id/' + oldProd.productID();
+                },
+                error: function () {
+                    alert("some error occured processing the request!!");
+                    document.location.href = '#/product/id/' + oldProd.productID();
+                }
+            });
+        }, viewModel);
+
+        viewModel.saveOrder = _.bind(function (oldOrder) {
+            var order = {
+                customerID: $("#orderCustomer").val(),
+                discount: $("#orderDiscount").val(),
+                address: $("#orderAddress").val(),
+                orderID: oldOrder.orderID(),
+                status: $("#orderStatus").val()
+            };
+            console.log(order);
+            $.ajax({
+                url: "order/update",
+                data: order,
+                type: "post",
+                success: function () {
+                    document.location.href = '#/order/id/' + oldOrder.orderID();
+                },
+                error: function () {
+                    alert("some error occured processing the request!!");
+                    document.location.href = '#/order/id/' + oldOrder.orderID();
+                }
+            });
+        }, viewModel);
+
+        viewModel.getOrderProducts = _.bind(function (order) {
+            return _.filter(viewModel.products(), function (prod) {
+                return _.map(order.productIDs(), function (e) { return e(); }).indexOf(prod.productID()) != -1;
+            });
+        }, viewModel);
+
+        viewModel.updateOrderProduct = _.bind(function (productID, orderID, quantity) {
+            $.ajax({
+                url: 'order/updateProduct/' + orderID,
+                type: 'post',
+                data: {
+                    productID: productID,
+                    quantity: quantity
+                },
+                success: console.log,
+                error: console.log
+            });
+        }, viewModel);
+
+        viewModel.getOrderStatusHTML = _.bind(function (status) {
+            var html = "";
+            for (var i = 0; i < utils.orderStatusIndex.length; i++) {
+                html += '<option value="' + i + '" ';
+                if (status == i) {
+                    console.log("selected:" + status);
+                    html += 'selected="true"';
+                }
+                html += ">" + utils.orderStatusIndex[i] + "</option>";
+            }
+            return html;
+        }, viewModel);
+
+        viewModel.getOrderCustomersHTML = _.bind(function (customerID) {
+            var html = "";
+            _.each(this.customers(), function (c) {
+                html += '<option value="' + c.customerID() + '" ';
+                if (c.customerID() == customerID) {
+                    console.log("selected:" + customerID);
+                    html += 'selected="true"';
+                }
+                html += ">" + c.name() + "</option>";
+            });
+            return html;
+        }, viewModel);
+
+        viewModel.getFileType = _.bind(function (type) {
+            return [
+                'Image',
+                'Doc',
+                'Video',
+                'Other'
+            ][type];
+        }, viewModel);
         return viewModel;
     }
 };

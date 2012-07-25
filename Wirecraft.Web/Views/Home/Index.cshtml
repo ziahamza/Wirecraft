@@ -37,6 +37,9 @@
     <script type="text/javascript" src="/signalr/hubs"></script>
 
 	@Html.Partial("_ordersStatusView")
+    @Html.Partial("_orderDetailView")
+    @Html.Partial("_orderEditView")
+
 
     @Html.Partial("_productsOverviewView")
     @Html.Partial("_productDetailView")
@@ -92,15 +95,19 @@
         												val()[i](e[key][i]);
         											}
         											else {
-        												val()[i] = ko.observable(e[key][i]);
+        												val.push(ko.observable(e[key][i]));
         											}
+        										}
+        										if (val().length > e[key].length) {
+        										    for (var i = e[key].length; i < val().length; i++) {
+        										        val.pop();
+        										    }
         										}
         									}
         									else {
         										val(e[key]);
         									}
         								});
-        								viewModel[table].push(utils.getObservableObject(e));
         							});
         						});
         					})(["blobs", "customers", "orders", "products"]);
@@ -111,7 +118,8 @@
         			});
         		}
         		catch (ex) {
-        			console.log(ex);
+        		    console.log(ex);
+        		    window.ex = ex;
         		}
             }
         })();
@@ -129,7 +137,19 @@
         		}, { variable: 'data' });
         		mainBody.html(parsed);
         		ko.applyBindings(viewModel);
-        	});
+            });
+
+            crossroads.addRoute("order/id/{id}", function (id) {
+                $(".nav-collapse .nav li").removeClass("active");
+                $('.nav li a[href="#/orders/status/pending"]').parent().addClass("active");
+                var mainBody = $("#mainBody");
+                var html = $("#orderDetailView").html();
+                var parsed = _.template(html, {
+                    orderID: id
+                }, { variable: "data" });
+                mainBody.html(parsed);
+                ko.applyBindings(viewModel, mainBody[0]);
+            });
 
             crossroads.addRoute("products/overview", function () {
                 $(".nav-collapse .nav li").removeClass("active");
@@ -232,7 +252,7 @@
             	mainBody.html(parsed);
             	ko.applyBindings(viewModel, mainBody[0]);
 
-
+            	
             	var uploader = new qq.FileUploader({
             		element: document.getElementById('productFile'),
             		action: '/product/uploadFile/' + id,
@@ -241,29 +261,30 @@
             		},
             		debug: true
             	});
-
-            	$("#saveProduct").click(function () {
-            		var customer = {
-            			birthDay: (new Date($('#customerBirthDay').val())).toJSON(),
-            			name: $('#customerName').val(),
-            			customerID: id
-            		};
-            		console.log(customer);
-            		$.ajax({
-            			url: "customer/update",
-            			data: customer,
-            			type: "post",
-            			success: function () {
-            				document.location.href = '#/customer/id/' + id;
-            			},
-            			error: function () {
-            				alert("some error occured processing the request!!");
-            				document.location.href = '#/customer/id/' + id;
-            			}
-            		});
-
-            		return false;
+            	$("#productFileType").change(function () {
+            	    uploader.setParams({
+            	        type: $("#productFileType").val()
+            	    });
             	});
+            });
+
+            crossroads.addRoute("order/edit/{id}", function (id) {
+                $(".nav-collapse .nav li").removeClass("active");
+                $('.nav li a[href="#/orders/status/pending"]').parent().addClass("active");
+                var mainBody = $("#mainBody");
+                var html = $("#orderEditView").html();
+                var parsed = _.template(html, {
+                    orderID: id
+                }, { variable: "data" });
+                mainBody.html(parsed);
+                ko.applyBindings(viewModel, mainBody[0]);
+
+
+                /*$("#productFileType").change(function () {
+                    uploader.setParams({
+                        type: $("#productFileType").val()
+                    });
+                });*/
             });
         })();
         $.connection.hub.start(function () {

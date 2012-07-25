@@ -24,7 +24,7 @@ namespace Wirecraft.Web.Controllers
             var customer = da.getCustomerByID(id);
             if (customer.photoName != null && customer.photoData != null)
             {
-                var type = "image/" + Path.GetExtension(customer.photoName).Substring(1);
+                var type = MimeTypes.mimes[Path.GetExtension(customer.photoName).Substring(1)];
                 return new FileContentResult(customer.photoData, type);
             }
             else {

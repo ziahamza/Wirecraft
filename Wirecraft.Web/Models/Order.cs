@@ -9,6 +9,7 @@ namespace Wirecraft.Web.Models
     {
         public int orderID { get; set; }
         public IEnumerable<int> productIDs { get; set; }
+        public IEnumerable<int> quantities { get; set; }
         public double discount { get; set; }
         public int customerID { get; set; }
         public OrderStatus status { get; set; }

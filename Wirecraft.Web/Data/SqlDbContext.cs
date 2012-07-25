@@ -16,6 +16,7 @@ namespace Wirecraft.Web.Data
         public DbSet<Blob> blobs { get; set; }
 
         public DbSet<ProductDoc> productDocs { get; set; }
+        public DbSet<OrderItem> orderItems { get; set; }
         
         protected void buildCustomers(EntityTypeConfiguration<Customer> customerEntity) {
             customerEntity
@@ -81,6 +82,10 @@ namespace Wirecraft.Web.Data
 			orderEntity
 				.HasRequired(x => x.customer)
 				.WithMany(x => x.orders);
+            orderEntity
+                .HasMany(x => x.products)
+                .WithRequired(x => x.order)
+                .WillCascadeOnDelete();
         }
         protected void buildOrderItems(EntityTypeConfiguration<OrderItem> orderItemEntity) {
             orderItemEntity

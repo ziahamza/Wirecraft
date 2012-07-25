@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Wirecraft.Web.Logic;
+using Wirecraft.Web.Models;
 
 namespace Wirecraft.Web.Controllers
 {
@@ -20,8 +21,8 @@ namespace Wirecraft.Web.Controllers
 
 		public ActionResult uploadFile(int id)
 		{
-			string fileName = Request.QueryString.GetValues("qqfile").FirstOrDefault();
-			int type = int.Parse(Request.QueryString.GetValues("type").FirstOrDefault());
+			string fileName = Request.QueryString.GetValues("qqfile").First();
+			int type = int.Parse(Request.QueryString.GetValues("type").First());
 			fileName = Guid.NewGuid().ToString() + "_" + fileName;
 			var fileStream = Request.InputStream;
 			using (MemoryStream ms = new MemoryStream())
@@ -34,6 +35,14 @@ namespace Wirecraft.Web.Controllers
 
 			return Json(new { success = true });
 		}
+        [HttpPost]
+        public ActionResult update(Product product)
+        {
+            DataAccess da = new DataAccess();
+            da.updateProduct(product);
+
+            return Json(new { success = true });
+        }
 
     }
 }

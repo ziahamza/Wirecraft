@@ -146,9 +146,11 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Common\Enums.cs" />
+    <Compile Include="Common\MimeTypes.cs" />
     <Compile Include="Controllers\BlobController.cs" />
     <Compile Include="Controllers\CustomerController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\OrderController.cs" />
     <Compile Include="Controllers\ProductController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -239,6 +241,7 @@
     <Content Include="Views\Home\_orderDetailView.cshtml" />
     <Content Include="Views\Home\_productDetailView.cshtml" />
     <Content Include="Views\Home\_productEditView.cshtml" />
+    <Content Include="Views\Home\_orderEditView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

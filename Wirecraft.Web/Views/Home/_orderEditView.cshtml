@@ -1,0 +1,89 @@
+﻿<script type="text/html" id="orderEditView">
+<div class="span3">
+	<div class="well sidebar-nav">
+		<ul class="nav nav-list">
+			<li class="nav-header">Orders</li>
+			<li><a href="#/orders/status/pending">Pending Orders</a></li>
+			<li><a href="#/orders/status/completed">Completed Orders</a></li>
+			<li><a href="#/orders/status/stopped">Stopped Orders</a></li>
+		</ul>
+	</div>
+	<!--/.well -->
+</div>
+
+<div class="span9" data-bind="with: getOrderById(<%= data.orderID %>)">
+    <form class="form-horizontal">
+    <fieldset>
+        <legend>Edit Order</legend>
+        <div class="control-group">
+          <label class="control-label" for="orderCustomer">Ordering Customer:</label>
+          <div class="controls">
+           <select id="orderCustomer" data-bind="html: $root.getOrderCustomersHTML(customerID())">
+		   </select>
+            <p class="help-block">Select the customer initiating the order</p>
+          </div>
+          <br />
+
+          <label class="control-label" for="orderStatus">Order current status:</label>
+          <div class="controls">
+           <select id="orderStatus" data-bind="html: $root.getOrderStatusHTML(status())">
+		   </select>
+            <p class="help-block">Select the customer initiating the order</p>
+          </div>
+          <br />
+
+          <label class="control-label" for="orderDiscount">Order Discounts:</label>
+          <div class="controls">
+           <input type="text" id="orderDiscount" data-bind="attr: { value: discount }" class="input-xlarge">
+            <p class="help-block">Enter the discount applied over the total final bill of order</p>
+          </div>
+          <br />
+		  
+          <label class="control-label" for="orderAddress">Order Address:</label>
+          <div class="controls">
+           <textarea id="orderAddress" data-bind="text: address"></textarea>
+            <p class="help-block">Enter the order destination address</p>
+          </div>
+          <br />
+		  
+          <label class="control-label" for="orderNewProduct">Add Products:</label>
+          <div class="controls">
+              <br /><br />
+		   <label>Select Product Name:</label>
+           <select id="orderNewProduct" data-bind="foreach: $root.products">
+		     <option data-bind="value: productID, text: name"></option>
+		   </select><br />
+           <label>Enter Product Quantity:</label>
+           <input style="display:inline-block;" type="text" id="orderNewQuantity" class="input-xlarge" value="1"><br /><br />
+           <a class="btn" data-bind="click: function(data, evt) { $root.updateOrderProduct($('#orderNewProduct').val(), <%= data.orderID %> ,$('#orderNewQuantity').val());}">Add or update product in order</a>
+           <div id="productFile"></div>
+            <p class="help-block">Put details for a new producted to be added to the order</p>
+          </div>
+        </div>
+
+    </fieldset>
+    </form>
+
+	<h1>Order Products:</h1>
+    <div class="row-fluid" data-bind="foreach: $root.getOrderProducts($data)"> 
+		<div class="span4 listItem">
+			<h2><span data-bind="text: name"></span></h2>
+            <img height="150" data-bind="attr: { src: $root.getProductImage(productID()) + '#' +  timeStamp() }" />
+			<div data-bind="text: description"></div>
+			<div>Price: <b data-bind="text: '$' + price()"></b></div>
+			<a class="btn" data-bind="click: function(data, evt) { $root.updateOrderProduct(productID(), <%= data.orderID %>, 0) }">Delete Product From Order</a>
+		</div>
+	<!--/span-->
+	</div>
+	<!--/row-->
+
+    <br /><br />
+    <div>
+	    <a class="btn" data-bind="click: $root.saveOrder">Save Order</a>
+	    <a class="btn">Delete order</a>
+    </div>
+	<br />
+
+</div>
+<!--/span-->
+</script>

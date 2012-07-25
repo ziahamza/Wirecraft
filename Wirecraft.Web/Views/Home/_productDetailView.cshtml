@@ -20,7 +20,7 @@
 	<a class="btn" href="#">Delete</a>
 	<br />
 	<div data-bind="foreach: $root.getProductImages(productID())">
-		<img data-bind="attr: { src: $data }" style="height:100px; margin:10px;"/>
+		<img data-bind="attr: { src: 'blob/imageById/' + blobID() + '#' + name() }" style="height:100px; margin:10px;"/>
 	</div>
 
 	<h2>Orders Containing <span data-bind="text: name"></span></h2>
@@ -28,8 +28,7 @@
         <div class="span4 listItem" style="margin:0px; padding:10px;">
 			<div>Address: <span data-bind="text: address"></span></div>
 			<div>Total Price: <b data-bind="text: '$' +  $root.getOrderPrice($data)"></b></div>
-			<a class="btn" href="#">View details &raquo;</a>
-			<a class="btn" href="#"><i class="icon-edit"></i> Edit</a>
+			<a class="btn" data-bind="attr: { href: '#/order/id/' + orderID() }">Order details &raquo;</a>
 		</div>
 		<!--/span-->
     </div>
