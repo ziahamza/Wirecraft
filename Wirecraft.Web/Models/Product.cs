@@ -12,6 +12,7 @@ namespace Wirecraft.Web.Models
 			price = 0;
 			description = "sample description here";
 			timeStamp = DateTime.Now.Date;
+			fileIDs = (new int[0]).AsEnumerable();
 		}
         public string name { get; set; }
         public int productID { get; set; }

@@ -13,12 +13,12 @@ namespace Wirecraft.Web.Controllers
     {
         public ActionResult Index()
         {
-            DataAccess dataLayer = new DataAccess();
+            DataAccess dataLayer = new DataAccess(HttpContext);
 
             ViewBag.Message = "Modify this template to kick-start your ASP.NET MVC application.";
 			ViewBag.objGraph = dataLayer.getDataGraph();
             HttpContext.Trace.Write("Hi from trace!!");
-
+			
             return View();
         }
     }

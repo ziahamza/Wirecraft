@@ -20,7 +20,7 @@ namespace Wirecraft.Web.Controllers
         }
         public FileContentResult image(int id)
         {
-            DataAccess da = new DataAccess();
+			DataAccess da = new DataAccess(HttpContext);
             var customer = da.getCustomerByID(id);
             if (customer.photoName != null && customer.photoData != null)
             {
@@ -41,7 +41,7 @@ namespace Wirecraft.Web.Controllers
             {
                 fileStream.CopyTo(ms);
                 byte[] photo = ms.GetBuffer();
-                DataAccess da = new DataAccess();
+				DataAccess da = new DataAccess(HttpContext);
                 da.updateCustomerPhoto(id, photo, fileName);
             }
 
@@ -50,7 +50,7 @@ namespace Wirecraft.Web.Controllers
 
         [HttpPost]
         public ActionResult update(Customer customer) {
-            DataAccess da = new DataAccess();
+			DataAccess da = new DataAccess(HttpContext);
             da.updateCustomer(customer);
 
             return Json(new { success = true });
@@ -59,7 +59,7 @@ namespace Wirecraft.Web.Controllers
 		[HttpPost]
 		public ActionResult add()
 		{
-			DataAccess da = new DataAccess();
+			DataAccess da = new DataAccess(HttpContext);
 			Customer customer = da.newCustomer();
 
 			return Json(customer);
@@ -68,7 +68,7 @@ namespace Wirecraft.Web.Controllers
 		[HttpPost]
 		public ActionResult delete(int id)
 		{
-			DataAccess da = new DataAccess();
+			DataAccess da = new DataAccess(HttpContext);
 			da.deleteCustomer(id);
 
 			return Json(new { success = true });

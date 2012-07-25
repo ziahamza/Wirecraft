@@ -29,7 +29,7 @@ namespace Wirecraft.Web.Controllers
 			{
 				fileStream.CopyTo(ms);
 				byte[] file = ms.GetBuffer();
-				DataAccess da = new DataAccess();
+				DataAccess da = new DataAccess(HttpContext);
 				da.addProductBlob(id, file, type, fileName);
 			}
 
@@ -38,7 +38,7 @@ namespace Wirecraft.Web.Controllers
         [HttpPost]
         public ActionResult update(Product product)
         {
-            DataAccess da = new DataAccess();
+			DataAccess da = new DataAccess(HttpContext);
             da.updateProduct(product);
 
             return Json(new { success = true });
@@ -47,7 +47,7 @@ namespace Wirecraft.Web.Controllers
 		[HttpPost]
 		public ActionResult add()
 		{
-			DataAccess da = new DataAccess();
+			DataAccess da = new DataAccess(HttpContext);
 			Product product = da.newProduct();
 
 			return Json(product);
@@ -56,7 +56,7 @@ namespace Wirecraft.Web.Controllers
 		[HttpPost]
 		public ActionResult delete(int id)
 		{
-			DataAccess da = new DataAccess();
+			DataAccess da = new DataAccess(HttpContext);
 			da.deleteProduct(id);
 
 			return Json(new { success = true });

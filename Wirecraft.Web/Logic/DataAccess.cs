@@ -13,64 +13,75 @@ namespace Wirecraft.Web.Logic
     public class DataAccess
     {
         public Data.SqlDbContext db { get; set; }
-        public DataAccess()
+		public HttpContextBase httpCtx { get; set; }
+        public DataAccess(HttpContextBase c)
         {
+			httpCtx = c;
             db = new Data.SqlDbContext();
         }
         public string getDataGraph()
         {
-            var orders = db.orders
-                .Select(x => new Models.Order
-                {
-                    orderID = x.orderID,
-                    discount = x.discount,
-                    productIDs = x.products.Select(y => y.productID),
-                    quantities = x.products.Select(y => y.quantity),
-                    customerID = x.customerID,
-                    status = x.status,
-                    timeStamp = x.timeStamp,
-                    address = x.address
-                }).ToArray();
+			if (httpCtx.Cache["dataGraph"] != null)
+			{
+				return (string)httpCtx.Cache["dataGraph"];
+			}
+			try {
+				var orders = db.orders
+					.Select(x => new Models.Order
+					{
+						orderID = x.orderID,
+						discount = x.discount,
+						productIDs = x.products.Select(y => y.productID),
+						quantities = x.products.Select(y => y.quantity),
+						customerID = x.customerID,
+						status = x.status,
+						timeStamp = x.timeStamp,
+						address = x.address
+					}).ToArray();
 
 
-            var customers = db.customers
-                .Select(x => new Models.Customer
-                {
-                    name = x.name,
-                    customerID = x.customerID,
-                    birthDay = x.birthDay,
-                    photoName = x.photoName,
-                    timeStamp = x.timeStamp
-                }).ToArray();
+				var customers = db.customers
+					.Select(x => new Models.Customer
+					{
+						name = x.name,
+						customerID = x.customerID,
+						birthDay = x.birthDay,
+						photoName = x.photoName,
+						timeStamp = x.timeStamp
+					}).ToArray();
 
-            var products = db.products
-                .Select(x => new Models.Product
-                {
-                    name = x.name,
-                    productID = x.productID,
-                    price = x.price,
-                    fileIDs = x.files.Select(y => y.blobID),
-                    description = x.description,
-                    timeStamp = x.timeStamp
-                }).ToArray();
+				var products = db.products
+					.Select(x => new Models.Product
+					{
+						name = x.name,
+						productID = x.productID,
+						price = x.price,
+						fileIDs = x.files.Select(y => y.blobID),
+						description = x.description,
+						timeStamp = x.timeStamp
+					}).ToArray();
 
-            var blobs = db.blobs
-                .Select(x => new Models.Blob
-                {
-                    name = x.name,
-                    blobID = x.blobID,
-                    type = x.type,
-                    timeStamp = x.timeStamp
-                }).ToArray();
-
-            return JsonConvert.SerializeObject(new
-            {
-                orders = orders,
-                customers = customers,
-                products = products,
-                blobs = blobs
-            });
-
+				var blobs = db.blobs
+					.Select(x => new Models.Blob
+					{
+						name = x.name,
+						blobID = x.blobID,
+						type = x.type,
+						timeStamp = x.timeStamp
+					}).ToArray();
+				httpCtx.Cache["dataGraph"] = JsonConvert.SerializeObject(new
+					{
+						orders = orders,
+						customers = customers,
+						products = products,
+						blobs = blobs
+					});
+				return (string)httpCtx.Cache["dataGraph"];
+			}
+			catch(Exception ex) {
+				httpCtx.Trace.Write("Database Read Error", "Cannot get object graph for the database", ex);
+				return "{}";
+			}
         }
 
         public Web.Data.Blob getBlobById(int id, BlobType type)
@@ -94,7 +105,13 @@ namespace Wirecraft.Web.Logic
             customer.photoData = photo;
             customer.photoName = name;
             customer.timeStamp = DateTime.Now.Date;
-            db.SaveChanges();
+			try {
+				db.SaveChanges();
+			}
+			catch(Exception ex) {
+				httpCtx.Trace.Write("Database write Error", "Error updating customer photo blob", ex);
+				return;
+			}
 
             var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
             ctx.Clients.updateModel(new[]{
@@ -126,7 +143,16 @@ namespace Wirecraft.Web.Logic
             oldCustomer.birthDay = customer.birthDay.Date;
             oldCustomer.name = customer.name;
             oldCustomer.timeStamp = customer.timeStamp;
-            db.SaveChanges();
+
+			try
+			{
+				db.SaveChanges();
+			}
+			catch (Exception ex)
+			{
+				httpCtx.Trace.Write("Database write Error", "Error updating customer entity", ex);
+				return;
+			}
 
             var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
             ctx.Clients.updateModel(new[]{
@@ -163,14 +189,30 @@ namespace Wirecraft.Web.Logic
                 type = (BlobType)type
             });
             product.timeStamp = DateTime.Now.Date;
-            db.SaveChanges();
+			try
+			{
+				db.SaveChanges();
+			}
+			catch (Exception ex)
+			{
+				httpCtx.Trace.Write("Database write Error", "Error updating customer entity", ex);
+				return;
+			}
             db.productDocs.Add(new Data.ProductDoc
             {
                 blobID = db.blobs.Where(x => x.name == fileName).SingleOrDefault().blobID,
                 productID = product.productID
             });
 
-            db.SaveChanges();
+			try
+			{
+				db.SaveChanges();
+			}
+			catch (Exception ex)
+			{
+				httpCtx.Trace.Write("Database write Error", "Error adding a new document for a product", ex);
+				return;
+			}
             var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
             ctx.Clients.updateModel(new dynamic[]{
 				new {
@@ -214,15 +256,21 @@ namespace Wirecraft.Web.Logic
 
         public void deleteBlob(int id)
         {
-            var blob = db.blobs.Where(x => x.blobID == id).SingleOrDefault();
-            var productDocs = db.productDocs.Where(x => x.blobID == id).ToList();
-            var productIDs = productDocs.Select(y => y.productID).ToArray();
-            var products = db.products.Where(x => productIDs.Contains(x.productID)).ToList();
+			
+			var blob = db.blobs.Where(x => x.blobID == id).SingleOrDefault();
+			var productDocs = db.productDocs.Where(x => x.blobID == id).ToList();
+			var productIDs = productDocs.Select(y => y.productID).ToArray();
+			var products = db.products.Where(x => productIDs.Contains(x.productID)).ToList();
+			
+			try {
+				db.blobs.Remove(blob);
+				productDocs.ForEach(x => db.productDocs.Remove(x));
 
-            db.blobs.Remove(blob);
-            productDocs.ForEach(x => db.productDocs.Remove(x));
-
-            db.SaveChanges();
+				db.SaveChanges();
+			}
+			catch(Exception ex) {
+				httpCtx.Trace.Write("Database write Error", "Error deleting a blob from database", ex);
+			}
 
 
             var diff = new dynamic[] {
@@ -285,7 +333,13 @@ namespace Wirecraft.Web.Logic
             oldProduct.price = product.price;
             oldProduct.name = product.name;
             oldProduct.timeStamp = product.timeStamp;
-            db.SaveChanges();
+
+			try {
+				db.SaveChanges();
+			}
+			catch(Exception ex) {
+				httpCtx.Trace.Write("Database write Error", "Error updating a product", ex);
+			}
 
             var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
             ctx.Clients.updateModel(new[]{
@@ -493,7 +547,8 @@ namespace Wirecraft.Web.Logic
 		{
 			var customer = db.customers.Where(x => x.customerID == id)
 				.Single();
-
+			var orders = db.orders.Where(x => x.customerID == customer.customerID);
+			orders.ToList().ForEach(x => db.orders.Remove(x));
 			db.customers.Remove(customer);
 
 			var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
@@ -501,7 +556,15 @@ namespace Wirecraft.Web.Logic
 				new {
 					op = "delete",
 					data = new {
-						orders = new Models.Order[0],
+						orders = orders.Select(x => new Models.Order {
+							address = x.address,
+							discount = x.discount,
+							customerID = x.customerID,
+							orderDate = x.orderDate,
+							orderID = x.orderID,
+							status = x.status,
+							timeStamp = x.timeStamp
+						}),
 						products = new Models.Product[0],
 						blobs = new Models.Blob[0],
 						customers = new Models.Customer[] {
@@ -558,12 +621,32 @@ namespace Wirecraft.Web.Logic
 			var dProduct = db.products.Where(x => x.productID == id)
 				.Single();
 			db.products.Remove(dProduct);
+
+			var orderItems = db.orderItems
+			.Where(x => x.productID == dProduct.productID);
+
+			orderItems.ToList().ForEach(x => db.orderItems.Remove(x));
+			var orderIDs = orderItems.Select(x => x.orderID).ToList();
+
+			var orders = db.orders
+			.Where(x => x.products
+			.Select(y => y.productID).Contains(id));
+
+			orders.ToList().ForEach(x => db.orders.Remove(x));
+
 			var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
-			ctx.Clients.updateModel(new[]{
+			ctx.Clients.updateModel(new dynamic[]{
 				new {
 					op = "delete",
 					data = new {
-						orders = new Models.Order[0],
+						orders = orders.Select(x => new Models.Order {
+							orderID = x.orderID,
+							address = x.address,
+							customerID = x.customerID,
+							orderDate = x.orderDate,
+							status = x.status,
+							timeStamp = x.timeStamp
+						}),
 						customers = new Models.Customer[0],
 						blobs = new Models.Blob[0],
 						products = new Models.Product[] {

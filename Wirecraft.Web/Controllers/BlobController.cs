@@ -19,7 +19,7 @@ namespace Wirecraft.Web.Controllers
         }
         public FileContentResult imageById(int id)
         {
-            DataAccess da = new DataAccess();
+			DataAccess da = new DataAccess(HttpContext);
             var blob = da.getBlobById(id, Common.BlobType.Image);
             if (blob != null)
             {
@@ -31,7 +31,7 @@ namespace Wirecraft.Web.Controllers
             }
         }
         public FileContentResult fileByName(string id) {
-            DataAccess da = new DataAccess();
+			DataAccess da = new DataAccess(HttpContext);
             var blob = da.getBlobByName(id);
             if (blob != null)
             {
@@ -45,7 +45,7 @@ namespace Wirecraft.Web.Controllers
         }
         [HttpPost]
 		public ActionResult delete(int id) {
-			DataAccess da = new DataAccess();
+			DataAccess da = new DataAccess(HttpContext);
 			da.deleteBlob(id);
 			return Json(new { success = true });
 		}
