@@ -4,7 +4,7 @@ var dataAccessHub = $.connection.dataAccessHub;
 (function () {
 	dataAccessHub.updateModel = function (changes) {
 		console.log("updating changes!!!");
-		console.log(changes);
+		utils.trace(changes);
 		_.each(changes, function (e) {
 			var data = e.data;
 			if (e.op === "add") {

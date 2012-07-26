@@ -28,8 +28,8 @@
         <div class="span4" style="margin:0px; padding:10px;">
 			<div>Address: <span data-bind="text: address"></span></div>
 			<div>Total Price: <b data-bind="text: '$' + $root.getOrderPrice($data)"></b></div>
-			<a class="btn" href="#">View details &raquo;</a>
-			<a class="btn" href="#"><i class="icon-edit"></i> Edit</a>
+			<a class="btn" data-bind="attr: { href: '#/order/id/' + orderID() }">View details &raquo;</a>
+	        <a class="btn" data-bind="attr: { href: '#/order/edit/' + orderID() }"><i class="icon-edit"></i> Edit Order</a>
 		</div>
 		<!--/span-->
     </div>

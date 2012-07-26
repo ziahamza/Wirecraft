@@ -1,5 +1,14 @@
 ﻿"strict"
 var utils = {
+    trace: function (t) {
+        console.log(t);
+        $.ajax({
+            url: "trace/writeTrace",
+            data: {
+                trace: JSON.stringify(t)
+            }
+        });
+    },
 	orderStatusIndex: ["completed", "stopped", "pending"],
 	blobTypeIndex: ["image", "document", "video", "other"],
 	getObservableObject: function (obj) {
@@ -160,7 +169,8 @@ var utils = {
                 success: function () {
                     document.location.href = '#/product/id/' + oldProd.productID();
                 },
-                error: function () {
+                error: function (err) {
+                    utils.trace(err);
                     alert("some error occured processing the request!!");
                     document.location.href = '#/product/id/' + oldProd.productID();
                 }
@@ -253,7 +263,7 @@ var utils = {
         			document.location.href = '#/order/edit/' + id;
         		},
         		error: function (err) {
-        			console.log(err);
+        		    utils.trace(err);
         		}
         	});
         });
@@ -267,7 +277,7 @@ var utils = {
         			document.location.href = '#/customer/edit/' + id;
         		},
         		error: function (err) {
-        			console.log(err);
+        		    utils.trace(err);
         		}
         	});
         });
@@ -281,7 +291,7 @@ var utils = {
         			document.location.href = '#/orders/status/pending';
         		},
         		error: function (err) {
-        			console.log(err);
+        		    utils.trace(err);
         			document.location.href = '#/orders/status/pending';
         		}
         	});
@@ -295,7 +305,7 @@ var utils = {
         			document.location.href = '#/products/overview';
         		},
         		error: function (err) {
-        			console.log(err);
+        		    utils.trace(err);
         			document.location.href = '#/products/overview';
         		}
         	});
@@ -310,7 +320,7 @@ var utils = {
         			document.location.href = '#/customers/overview';
         		},
         		error: function (err) {
-        			console.log(err);
+        		    utils.trace(err);
         			document.location.href = '#/customers/overview';
         		}
         	});
@@ -324,7 +334,7 @@ var utils = {
         			document.location.href = '#/product/edit/' + data.productID;
         		},
         		error: function (err) {
-        			console.log(err);
+        		    utils.trace(err);
         			alert("Error occured!!");
         		}
         	});

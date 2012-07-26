@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Web;
+using System.Web.Hosting;
 using Newtonsoft.Json;
 using SignalR;
 using SignalR.Hubs;
@@ -16,70 +19,87 @@ namespace Wirecraft.Web.Logic
 		public HttpContextBase httpCtx { get; set; }
         public DataAccess(HttpContextBase c)
         {
-			httpCtx = c;
+            httpCtx = c;
+            httpCtx.Trace.TraceMode = TraceMode.SortByTime;
+            httpCtx.Trace.IsEnabled = true;
+            
+            httpCtx.Trace.TraceFinished += (x, y) => {
+                using (FileStream fs = new FileStream(HostingEnvironment.ApplicationPhysicalPath + "/App_Data/db_log.txt", FileMode.Append, FileAccess.Write, FileShare.None))
+                {
+                    foreach (TraceContextRecord trace in y.TraceRecords)
+                    {
+                        var message = "/r/n/r/n Categry: " + trace.Category + "/r/n";
+                        message += trace.Message;
+                        var bytes = UTF8Encoding.UTF8.GetBytes(message);
+                        fs.Write(bytes, 0, bytes.Length);
+                    }
+                }
+            };
             db = new Data.SqlDbContext();
+        }
+
+        public void routeDiffs(object objGraph) {
+            var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
+            ctx.Clients.updateModel(objGraph);
+
+            this.httpCtx.Trace.Write(JsonConvert.SerializeObject(objGraph));
         }
         public string getDataGraph()
         {
-			if (httpCtx.Cache["dataGraph"] != null)
-			{
-				return (string)httpCtx.Cache["dataGraph"];
-			}
-			try {
-				var orders = db.orders
-					.Select(x => new Models.Order
-					{
-						orderID = x.orderID,
-						discount = x.discount,
-						productIDs = x.products.Select(y => y.productID),
-						quantities = x.products.Select(y => y.quantity),
-						customerID = x.customerID,
-						status = x.status,
-						timeStamp = x.timeStamp,
-						address = x.address
-					}).ToArray();
+			try{
+			    var orders = db.orders
+				    .Select(x => new Models.Order
+				    {
+					    orderID = x.orderID,
+					    discount = x.discount,
+					    productIDs = x.products.Select(y => y.productID),
+					    quantities = x.products.Select(y => y.quantity),
+					    customerID = x.customerID,
+					    status = x.status,
+					    timeStamp = x.timeStamp,
+					    address = x.address
+				    }).ToArray();
 
 
-				var customers = db.customers
-					.Select(x => new Models.Customer
-					{
-						name = x.name,
-						customerID = x.customerID,
-						birthDay = x.birthDay,
-						photoName = x.photoName,
-						timeStamp = x.timeStamp
-					}).ToArray();
+			    var customers = db.customers
+				    .Select(x => new Models.Customer
+				    {
+					    name = x.name,
+					    customerID = x.customerID,
+					    birthDay = x.birthDay,
+					    photoName = x.photoName,
+					    timeStamp = x.timeStamp
+				    }).ToArray();
 
-				var products = db.products
-					.Select(x => new Models.Product
-					{
-						name = x.name,
-						productID = x.productID,
-						price = x.price,
-						fileIDs = x.files.Select(y => y.blobID),
-						description = x.description,
-						timeStamp = x.timeStamp
-					}).ToArray();
+			    var products = db.products
+				    .Select(x => new Models.Product
+				    {
+					    name = x.name,
+					    productID = x.productID,
+					    price = x.price,
+					    fileIDs = x.files.Select(y => y.blobID),
+					    description = x.description,
+					    timeStamp = x.timeStamp
+				    }).ToArray();
 
-				var blobs = db.blobs
-					.Select(x => new Models.Blob
-					{
-						name = x.name,
-						blobID = x.blobID,
-						type = x.type,
-						timeStamp = x.timeStamp
-					}).ToArray();
-				httpCtx.Cache["dataGraph"] = JsonConvert.SerializeObject(new
-					{
-						orders = orders,
-						customers = customers,
-						products = products,
-						blobs = blobs
-					});
-				return (string)httpCtx.Cache["dataGraph"];
-			}
-			catch(Exception ex) {
-				httpCtx.Trace.Write("Database Read Error", "Cannot get object graph for the database", ex);
+			    var blobs = db.blobs
+				    .Select(x => new Models.Blob
+				    {
+					    name = x.name,
+					    blobID = x.blobID,
+					    type = x.type,
+					    timeStamp = x.timeStamp
+				    }).ToArray();
+			    return JsonConvert.SerializeObject(new
+				    {
+					    orders = orders,
+					    customers = customers,
+					    products = products,
+					    blobs = blobs
+				    });
+			    }
+		   	catch(Exception ex) {
+				httpCtx.Trace.Warn("Database Read Error", "Cannot get object graph for the database", ex);
 				return "{}";
 			}
         }
@@ -109,12 +129,11 @@ namespace Wirecraft.Web.Logic
 				db.SaveChanges();
 			}
 			catch(Exception ex) {
-				httpCtx.Trace.Write("Database write Error", "Error updating customer photo blob", ex);
+                httpCtx.Trace.Warn("Database write Error", "Error updating customer photo blob", ex);
 				return;
 			}
 
-            var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
-            ctx.Clients.updateModel(new[]{
+            routeDiffs(new[]{
 				new {
 					op = "update",
 					data = new {
@@ -150,12 +169,11 @@ namespace Wirecraft.Web.Logic
 			}
 			catch (Exception ex)
 			{
-				httpCtx.Trace.Write("Database write Error", "Error updating customer entity", ex);
+                httpCtx.Trace.Warn("Database write Error", "Error updating customer entity", ex);
 				return;
 			}
 
-            var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
-            ctx.Clients.updateModel(new[]{
+            routeDiffs(new[]{
 				new {
 					op = "update",
 					data = new {
@@ -195,7 +213,7 @@ namespace Wirecraft.Web.Logic
 			}
 			catch (Exception ex)
 			{
-				httpCtx.Trace.Write("Database write Error", "Error updating customer entity", ex);
+                httpCtx.Trace.Warn("Database write Error", "Error updating customer entity", ex);
 				return;
 			}
             db.productDocs.Add(new Data.ProductDoc
@@ -210,11 +228,10 @@ namespace Wirecraft.Web.Logic
 			}
 			catch (Exception ex)
 			{
-				httpCtx.Trace.Write("Database write Error", "Error adding a new document for a product", ex);
+                httpCtx.Trace.Warn("Database write Error", "Error adding a new document for a product", ex);
 				return;
 			}
-            var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
-            ctx.Clients.updateModel(new dynamic[]{
+            routeDiffs(new dynamic[]{
 				new {
 						op = "add",
 						data = new {
@@ -269,7 +286,7 @@ namespace Wirecraft.Web.Logic
 				db.SaveChanges();
 			}
 			catch(Exception ex) {
-				httpCtx.Trace.Write("Database write Error", "Error deleting a blob from database", ex);
+                httpCtx.Trace.Warn("Database write Error", "Error deleting a blob from database", ex);
 			}
 
 
@@ -311,8 +328,7 @@ namespace Wirecraft.Web.Logic
 			};
 
 
-            var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
-            ctx.Clients.updateModel(diff);
+            routeDiffs(diff);
 
         }
 
@@ -338,11 +354,10 @@ namespace Wirecraft.Web.Logic
 				db.SaveChanges();
 			}
 			catch(Exception ex) {
-				httpCtx.Trace.Write("Database write Error", "Error updating a product", ex);
+                httpCtx.Trace.Warn("Database write Error", "Error updating a product", ex);
 			}
 
-            var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
-            ctx.Clients.updateModel(new[]{
+            routeDiffs(new[]{
 				new {
 					op = "update",
 					data = new {
@@ -366,7 +381,6 @@ namespace Wirecraft.Web.Logic
 
         public void updateOrderProduct(int id, int productID, int quantity)
         {
-            var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
 
             var orderItems = db.orderItems.Where(x => x.orderID == id && x.productID == productID);
 
@@ -389,8 +403,15 @@ namespace Wirecraft.Web.Logic
                     quantity = quantity
                 });
             }
-            db.SaveChanges();
-            ctx.Clients.updateModel(new[]{
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception ex) {
+                httpCtx.Trace.Warn("Database write Error", "Cannot update product of an order", ex);
+                return;
+            }
+            routeDiffs(new[]{
 				new {
 					op = "update",
 					data = new {
@@ -424,9 +445,16 @@ namespace Wirecraft.Web.Logic
             oldOrder.customerID = order.customerID;
             oldOrder.status = order.status;
             oldOrder.timeStamp = DateTime.Now.Date;
-            db.SaveChanges();
-            var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
-            ctx.Clients.updateModel(new[]{
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                httpCtx.Trace.Warn("Database write Error", "Cannot update order", ex);
+                return;
+            }
+            routeDiffs(new[]{
 				new {
 					op = "update",
 					data = new {
@@ -437,13 +465,17 @@ namespace Wirecraft.Web.Logic
                         .Select(x => new Models.Order {
 							orderID = x.orderID,
                             discount = x.discount,
-                            productIDs = x.products.Select(y => y.productID),
-                            quantities = x.products.Select(y => y.quantity),
+                            productIDs = db.orderItems
+                                .Where(y => y.orderID == oldOrder.orderID)
+                                .Select(y => y.productID),
+                            quantities = db.orderItems
+                                .Where(y => y.orderID == oldOrder.orderID)
+                                .Select(y => y.quantity),
                             customerID = x.customerID,
                             status = x.status,
                             timeStamp = x.timeStamp,
                             address = x.address
-						})
+						}).ToArray()
 						
 					}
 				}
@@ -464,12 +496,19 @@ namespace Wirecraft.Web.Logic
 			};
 
 			db.orders.Add(dOrder);
-			db.SaveChanges();
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                httpCtx.Trace.Warn("Database write Error", "Cannot a new order", ex);
+                return new Models.Order();
+            }
 		
 			order.orderID = dOrder.orderID;
 
-			var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
-			ctx.Clients.updateModel(new[]{
+            routeDiffs(new[]{
 				new {
 					op = "add",
 					data = new {
@@ -489,8 +528,17 @@ namespace Wirecraft.Web.Logic
 		public void deleteOrder(int orderID)
 		{
 			var order = db.orders.Where(x => x.orderID == orderID).Single();
-			var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
-			ctx.Clients.updateModel(new[]{
+			db.orders.Remove(order);
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                httpCtx.Trace.Warn("Database write Error", "Cannot delete an order", ex);
+                return;
+            }
+            routeDiffs(new[]{
 				new {
 					op = "delete",
 					data = new {
@@ -506,9 +554,7 @@ namespace Wirecraft.Web.Logic
 					}
 				}
 			});
-
-			db.orders.Remove(order);
-			db.SaveChanges();
+			
 		}
 
 		public Models.Customer newCustomer()
@@ -522,11 +568,18 @@ namespace Wirecraft.Web.Logic
 			};
 
 			db.customers.Add(dCustomer);
-			db.SaveChanges();
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                httpCtx.Trace.Warn("Database write Error", "Error creating a new Customer", ex);
+                return new Models.Customer();
+            }
 
 			customer.customerID = dCustomer.customerID;
-			var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
-			ctx.Clients.updateModel(new[]{
+            routeDiffs(new[]{
 				new {
 					op = "add",
 					data = new {
@@ -551,8 +604,7 @@ namespace Wirecraft.Web.Logic
 			orders.ToList().ForEach(x => db.orders.Remove(x));
 			db.customers.Remove(customer);
 
-			var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
-			ctx.Clients.updateModel(new[]{
+            routeDiffs(new[]{
 				new {
 					op = "delete",
 					data = new {
@@ -581,7 +633,15 @@ namespace Wirecraft.Web.Logic
 				}
 			});
 
-			db.SaveChanges();
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                httpCtx.Trace.Warn("Database write Error", "Cannot delete customer", ex);
+                return;
+            }
 		}
 
 		public Models.Product newProduct()
@@ -595,10 +655,17 @@ namespace Wirecraft.Web.Logic
 			};
 
 			db.products.Add(newProd);
-			db.SaveChanges();
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                httpCtx.Trace.Warn("Database write Error", "Cannot create a new product", ex);
+                return new Models.Product();
+            }
 			product.productID = newProd.productID;
-			var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
-			ctx.Clients.updateModel(new[]{
+            routeDiffs(new[]{
 				new {
 					op = "add",
 					data = new {
@@ -634,8 +701,7 @@ namespace Wirecraft.Web.Logic
 
 			orders.ToList().ForEach(x => db.orders.Remove(x));
 
-			var ctx = GlobalHost.ConnectionManager.GetHubContext<DataAccessHub>();
-			ctx.Clients.updateModel(new dynamic[]{
+            routeDiffs(new dynamic[]{
 				new {
 					op = "delete",
 					data = new {
@@ -662,7 +728,15 @@ namespace Wirecraft.Web.Logic
 					}
 				}
 			});
-			db.SaveChanges();
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                httpCtx.Trace.Warn("Database write Error", "Cannot delete a product", ex);
+                return;
+            }
 		}
 	}   
 }
