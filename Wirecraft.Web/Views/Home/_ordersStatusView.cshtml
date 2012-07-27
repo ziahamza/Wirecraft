@@ -15,7 +15,7 @@
 <div class="span9">
     <div class="row-fluid" data-bind="foreach: <%= data.ordersFunc %>"> 
 		<div class="span4 listItem">
-			<h2>Order By: <a data-bind="text: $root.getCustomerById(customerID()).name, attr: {href: '#/customer/id/' + customerID()}"></a></h2>
+			<h2><a data-bind="text: $root.getCustomerById(customerID()).name, attr: {href: '#/customer/id/' + customerID()}"></a></h2>
 			<div data-bind="text: address"></div>
 			<div>Total Price: <b data-bind="text: '$' +  $root.getOrderPrice($data)"></b></div>
 			<a class="btn" data-bind="attr: { href: '#/order/id/' + orderID() }">View details &raquo;</a>

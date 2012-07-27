@@ -22,7 +22,7 @@ namespace Wirecraft.Web.Controllers
         {
 			DataAccess da = new DataAccess(HttpContext);
             var customer = da.getCustomerByID(id);
-            if (customer.photoName != null && customer.photoData != null)
+            if (customer != null && customer.photoName != null && customer.photoData != null)
             {
                 var type = MimeTypes.mimes[Path.GetExtension(customer.photoName).Substring(1)];
                 return new FileContentResult(customer.photoData, type);

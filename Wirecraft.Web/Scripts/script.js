@@ -90,11 +90,18 @@ var utils = {
         viewModel.getOrderPrice = _.bind(function (order) {
         	var that = this;
         	var price = 0;
-        	for (var i = 0; i < order.productIDs().length; i++) {
-        	    price += that.getProductById(order.productIDs()[i]()).price() * order.quantities()[i]();
-        	}
+            try {
+                for (var i = 0; i < order.productIDs().length; i++) {
+                    var product = that.getProductById(order.productIDs()[i]());
+                    if (product)
+                        price += product.price() * order.quantities()[i]();
+                }
 
-        	price -= order.discount();
+                price -= order.discount();
+            }
+            catch (ex) {
+                
+            }
         	return price;
         }, viewModel);
 

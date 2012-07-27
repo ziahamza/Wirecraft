@@ -11,7 +11,9 @@ namespace Wirecraft.Web.Controllers
     {
         //
         // GET: /Trace/
-
+        public TraceController() {
+        }
+        private static object _ui_exp_lock = new object();
         public ActionResult Index()
         {
             return View();
@@ -22,7 +24,10 @@ namespace Wirecraft.Web.Controllers
         public string writeTrace(string trace) {
             trace += "/r/n";
             HttpContext.Trace.Warn(trace);
-            System.IO.File.AppendAllText(HostingEnvironment.ApplicationPhysicalPath + "/App_Data/ui_exception.txt", trace);
+            lock(_ui_exp_lock)
+            {
+                System.IO.File.AppendAllText(HostingEnvironment.ApplicationPhysicalPath + "/App_Data/ui_exception.txt", trace);
+            }
             return "success";
         }
 

@@ -6,66 +6,81 @@ var dataAccessHub = $.connection.dataAccessHub;
 		console.log("updating changes!!!");
 		utils.trace(changes);
 		_.each(changes, function (e) {
-			var data = e.data;
-			if (e.op === "add") {
-				(function (tables) {
-					_.each(tables, function (table) {
-						_.each(data[table], function (e) {
-							console.log("adding:" + JSON.stringify(e) + " to:" + table);
-							viewModel[table].push(utils.getObservableObject(e));
-						});
-					});
-				})(["blobs", "customers", "orders", "products"]);
-			}
-			if (e.op === "delete") {
-				(function (tables) {
-					_.each(tables, function (table) {
-						_.each(data[table], function (e) {
-							viewModel[table].remove(function (k) {
-								return k[table.slice(0, -1) + "ID"]() === e[table.slice(0, -1) + "ID"];
-							});
-						});
-					});
-				})(["blobs", "customers", "orders", "products"]);
-			}
-			if (e.op === "update") {
-				(function (tables) {
-					_.each(tables, function (table) {
-						_.each(data[table], function (e) {
-							var entity = _.chain(viewModel[table]()).filter(function (k) {
-								return k[table.slice(0, -1) + "ID"]() === e[table.slice(0, -1) + "ID"];
-							}).last().value();
-							for (var key in e) {
-								if (Object.prototype.toString.call(e[key]) === '[object Array]') {
-									if (!entity[key]) {
-										entity[key] = ko.observableArray(e[key]);
-									} else {
-										for (var i = 0; i < e[key].length; i++) {
-											if (entity[key]() && entity[key]()[i]) {
-												entity[key]()[i](e[key][i]);
-											}
-											else {
-												entity[key].push(ko.observable(e[key][i]));
-											}
-										}
-										if (entity[key]().length > e[key].length) {
-											for (var i = e[key].length; i < entity[key]().length; i++) {
-												entity[key].pop();
-											}
-										}
-									}
-								}
-								else {
-									if (!entity[key]) {
-										entity[key] = ko.observable();
-									}
-									entity[key](e[key]);
-								}
-							};
-						});
-					});
-				})(["blobs", "customers", "orders", "products"]);
-			}
+		    try {
+		        var data = e.data;
+		        if (e.op === "add") {
+		            (function (tables) {
+		                _.each(tables, function (table) {
+		                    _.each(data[table], function (k) {
+		                        console.log("adding:" + JSON.stringify(k) + " to: " + table);
+		                        viewModel[table].push(utils.getObservableObject(k));
+		                    });
+		                });
+		            })(["blobs", "customers", "orders", "products"]);
+		        }
+		        if (e.op === "delete") {
+		            (function (tables) {
+		                _.each(tables, function (table) {
+		                    _.each(data[table], function (j) {
+		                        viewModel[table].remove(function (k) {
+		                            return k[table.slice(0, -1) + "ID"]() === j[table.slice(0, -1) + "ID"];
+		                        });
+		                    });
+		                });
+		            })(["blobs", "customers", "orders", "products"]);
+		        }
+		        if (e.op === "update") {
+		            (function (tables) {
+		                _.each(tables, function (table) {
+		                    _.each(data[table], function (j) {
+		                        var entity = _.chain(viewModel[table]()).filter(function (k) {
+		                            return k[table.slice(0, -1) + "ID"]() === j[table.slice(0, -1) + "ID"];
+		                        }).last().value();
+		                        console.log("updating:", entity," to: ", j)
+		                        for (var key in j) {
+		                            console.log("woring now with " + key);
+		                            if (Object.prototype.toString.call(j[key]) === '[object Array]') {
+		                                if (!entity[key]) {
+		                                    console.log("adding new " + key + " array with values: ", j[key]);
+		                                    entity[key] = ko.observableArray(j[key]);
+		                                } else {
+		                                    for (var i = 0; i < j[key].length; i++) {
+		                                        if (entity[key]() && entity[key]()[i]) {
+		                                            console.log("updating " + entity[key]()[i]() + " in " + key + " with value: " + j[key][i]);
+		                                            entity[key]()[i](j[key][i]);
+		                                        }
+		                                        else {
+		                                            console.log("adding val in " + key);
+		                                            entity[key].push(ko.observable(j[key][i]));
+		                                        }
+		                                    }
+		                                    if (entity[key]().length > j[key].length) {
+		                                        for (var i = j[key].length; i < entity[key]().length; i++) {
+		                                            console.log("removing val in " + key);
+		                                            entity[key].pop();
+		                                        }
+		                                    }
+		                                }
+		                            }
+		                            else {
+		                                if (!entity[key]) {
+		                                    console.log("creating a new place for " + key);
+		                                    entity[key] = ko.observable();
+		                                }
+		                                console.log("updating " + key + " from " + entity[key]() + " to " + j[key]);
+		                                entity[key](j[key]);
+		                            }
+		                        };
+		                    });
+		                });
+		            })(["blobs", "customers", "orders", "products"]);
+		        }
+		    }
+		    catch (ex) {
+		        window.ex = ex;
+		        console.log(ex);
+		        utils.trace("cant update the view model", e);
+		    }
 		});
 	}
 })();

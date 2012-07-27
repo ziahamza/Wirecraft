@@ -159,9 +159,9 @@
     <Compile Include="HttpModules\ExceptionInterceptor.cs" />
     <Compile Include="Hubs\DataAccessHub.cs" />
     <Compile Include="Logic\DataAccess.cs" />
-    <Compile Include="Migrations\initial.cs" />
-    <Compile Include="Migrations\initial.Designer.cs">
-      <DependentUpon>initial.cs</DependentUpon>
+    <Compile Include="Migrations\initial_database_schema.cs" />
+    <Compile Include="Migrations\initial_database_schema.Designer.cs">
+      <DependentUpon>initial_database_schema.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Data\Blob.cs" />

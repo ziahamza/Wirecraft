@@ -15,6 +15,7 @@ namespace Wirecraft.Web.Logic
 {
     public class DataAccess
     {
+        private static object _db_log_lock = new object();
         public Data.SqlDbContext db { get; set; }
 		public HttpContextBase httpCtx { get; set; }
         public DataAccess(HttpContextBase c)
@@ -24,16 +25,18 @@ namespace Wirecraft.Web.Logic
             httpCtx.Trace.IsEnabled = true;
             
             httpCtx.Trace.TraceFinished += (x, y) => {
-                using (FileStream fs = new FileStream(HostingEnvironment.ApplicationPhysicalPath + "/App_Data/db_log.txt", FileMode.Append, FileAccess.Write, FileShare.None))
+                var message = "";
+                
+                foreach (TraceContextRecord trace in y.TraceRecords)
                 {
-                    foreach (TraceContextRecord trace in y.TraceRecords)
-                    {
-                        var message = "/r/n/r/n Categry: " + trace.Category + "/r/n";
-                        message += trace.Message;
-                        var bytes = UTF8Encoding.UTF8.GetBytes(message);
-                        fs.Write(bytes, 0, bytes.Length);
-                    }
+                    message += "/r/n/r/n Categry: " + trace.Category + "/r/n";
+                    message += trace.Message;
                 }
+                lock (_db_log_lock)
+                {
+                    File.AppendAllText(HostingEnvironment.ApplicationPhysicalPath + "/App_Data/db_log.txt", message);
+                }
+                
             };
             db = new Data.SqlDbContext();
         }
@@ -371,7 +374,8 @@ namespace Wirecraft.Web.Logic
 								description = oldProduct.description,
 								price = oldProduct.price,
 								timeStamp = oldProduct.timeStamp,
-                                fileIDs = oldProduct.files.Select(y => y.blobID)
+                                fileIDs = oldProduct.files.Select(y => y.blobID).ToArray()
+
 							}
 						}
 					}
@@ -428,7 +432,7 @@ namespace Wirecraft.Web.Logic
                             status = order.status,
                             timeStamp = order.timeStamp,
                             address = order.address
-						})
+						}).ToArray()
 						
 					}
 				}
@@ -616,7 +620,7 @@ namespace Wirecraft.Web.Logic
 							orderID = x.orderID,
 							status = x.status,
 							timeStamp = x.timeStamp
-						}),
+						}).ToArray(),
 						products = new Models.Product[0],
 						blobs = new Models.Blob[0],
 						customers = new Models.Customer[] {
@@ -712,7 +716,7 @@ namespace Wirecraft.Web.Logic
 							orderDate = x.orderDate,
 							status = x.status,
 							timeStamp = x.timeStamp
-						}),
+						}).ToArray(),
 						customers = new Models.Customer[0],
 						blobs = new Models.Blob[0],
 						products = new Models.Product[] {
